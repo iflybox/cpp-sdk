@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MD5">
+      <UniqueIdentifier>{3fb565e6-e985-47a6-9750-9ffb360fd2d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="iflybox">
+      <UniqueIdentifier>{53f96a99-79d0-4156-bf34-f6b781fe5af7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dstester_opts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="asc_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dstester_cfg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="thr_mngr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="thr_pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="proc_resp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dum_svc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dstester_log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="md5lib.h">
+      <Filter>MD5</Filter>
+    </ClInclude>
+    <ClInclude Include="iflybox.h">
+      <Filter>iflybox</Filter>
+    </ClInclude>
+    <ClInclude Include="iflybox_svc.h">
+      <Filter>iflybox</Filter>
+    </ClInclude>
+    <ClInclude Include="FileVerInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dstester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="md5lib.c">
+      <Filter>MD5</Filter>
+    </ClCompile>
+    <ClCompile Include="iflybox_svc.cpp">
+      <Filter>iflybox</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="dstester.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="FileVerInfo.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,108 @@
+#ifndef __PSP_ERRORS_H__
+#define __PSP_ERRORS_H__
+
+enum
+{
+	PSP_CF_SUCCESS					= 0,
+	PSP_CF_ERROR_FAIL				= -1,
+	PSP_CF_ERROR_EXCEPTION			= -2,
+
+	/* General errors 30100 */
+	PSP_CF_ERROR_GENERAL			= 30100,
+	PSP_CF_ERROR_OUT_OF_MEMORY		= 30101,
+	PSP_CF_ERROR_FILE_NOT_FOUND		= 30102,
+	PSP_CF_ERROR_NOT_SUPPORT		= 30103,
+	PSP_CF_ERROR_NOT_IMPLEMENT		= 30104,
+	PSP_CF_ERROR_ACCESS				= 30105,
+	PSP_CF_ERROR_INVALID_PARA		= 30106,
+	PSP_CF_ERROR_INVALID_PARA_VALUE = 30107,
+	PSP_CF_ERROR_INVALID_HANDLE		= 30108,
+	PSP_CF_ERROR_INVALID_DATA		= 30109,
+	PSP_CF_ERROR_NO_LICENSE			= 30110,
+	PSP_CF_ERROR_NOT_INIT			= 30111,
+	PSP_CF_ERROR_NULL_HANDLE		= 30112,
+	PSP_CF_ERROR_OVERFLOW			= 30113,
+	PSP_CF_ERROR_TIME_OUT			= 30114,
+	PSP_CF_ERROR_OPEN_FILE			= 30115,
+	PSP_CF_ERROR_NOT_FOUND			= 30116,
+	PSP_CF_ERROR_NO_ENOUGH_BUFFER	= 30117,
+	PSP_CF_ERROR_NO_DATA			= 30118,
+	PSP_CF_ERROR_NO_MORE_DATA		= 30119,
+	PSP_CF_ERROR_SKIPPED			= 30120,
+	PSP_CF_ERROR_ALREADY_EXIST		= 30121,
+	PSP_CF_ERROR_LOAD_MODULE		= 30122,
+	PSP_CF_ERROR_BUSY				= 30123,
+	PSP_CF_ERROR_INVALID_CONFIG		= 30124,
+	PSP_CF_ERROR_VERSION_CHECK		= 30125,
+	PSP_CF_ERROR_CANCELED			= 30126,
+	PSP_CF_ERROR_INVALID_MEDIA_TYPE	= 30127,
+	PSP_CF_ERROR_CONFIG_INITIALIZE	= 30128,
+	PSP_CF_ERROR_CREATE_HANDLE		= 30129,
+	PSP_CF_ERROR_CODING_LIB_NOT_LOAD= 30130,
+	PSP_CF_ERROR_OPERATION_NOT_SUP	= 30131,
+	PSP_CF_ERROR_INPROC				= 30132,
+	PSP_CF_ERROR_TOOMANYREQ			= 30133,
+	PSP_CF_ERROR_CACHE_FULL         = 30134,
+	PSP_CF_ERROR_TIMEOUT			= 30135,
+	PSP_CF_ERROR_GENERAL_LAST,
+
+	/* network error 30200*/
+	PSP_CF_ERROR_NET_GENERAL		= 30200,
+	PSP_CF_ERROR_NET_OPENSOCK       = 30201,/* Open socket */
+	PSP_CF_ERROR_NET_CONNECTSOCK    = 30202,/* Connect socket */
+	PSP_CF_ERROR_NET_ACCEPTSOCK     = 30203,/* Accept socket */
+	PSP_CF_ERROR_NET_SENDSOCK       = 30204,/* Send socket data */
+	PSP_CF_ERROR_NET_RECVSOCK       = 30205,/* Recv socket data */
+	PSP_CF_ERROR_NET_INVALIDSOCK    = 30206,/* Invalid socket handle */
+	PSP_CF_ERROR_NET_BADADDRESS     = 30207,/* Bad network address */
+	PSP_CF_ERROR_NET_BINDSEQUENCE   = 30208,/* Bind after listen/connect */
+	PSP_CF_ERROR_NET_NOTOPENSOCK    = 30209,/* Socket is not opened */
+	PSP_CF_ERROR_NET_NOTBIND        = 30210,/* Socket is not bind to an address */
+	PSP_CF_ERROR_NET_NOTLISTEN      = 30211,/* Socket is not listening */
+	PSP_CF_ERROR_NET_CONNECTCLOSE   = 30212,/* The other side of connection is closed */
+	PSP_CF_ERROR_NET_NOTDGRAMSOCK   = 30213,/* The socket is not datagram type */
+	PSP_CF_ERROR_NET_DNS     		= 30214,/* domain name is invalid or dns server does not function well */
+	PSP_CF_ERROR_NET_LAST,
+
+	/* Distributed Storage System Error 31100*/
+	PSP_DS_ERROR_GENERAL			= 31100,
+	PSP_DS_ERROR_OUTOFRANGE			= 31101,
+	PSP_DS_ERROR_QUOTA				= 31102,
+	PSP_VD_ERROR_VIRNOEXIST			= 31103,
+	PSP_VD_ERROR_REALNOEXIST		= 31104,
+	PSP_VD_ERROR_VIREXISTED			= 31105,
+	PSP_DS_ERROR_HDFS_DOWN			= 31106,
+	PSP_DS_ERROR_LAST,
+
+	/* Distributed Coordinator Error 32100*/
+	PSP_DC_ERROR_GENERAL					= 32100,
+	PSP_DC_ERROR_SYSTEM						= 32101,
+	PSP_DC_ERROR_RUNTIMEINCONSISTENCY		= 32102,	/* A runtime inconsistency was found */
+	PSP_DC_ERROR_DATAINCONSISTENCY			= 32103,	/* A data inconsistency was found */
+	PSP_DC_ERROR_CONNECTIONLOSS				= 32104,	/* Connection to the server has been lost */
+	PSP_DC_ERROR_MARSHALLINGERROR			= 32105,	/* Error while marshalling or unmarshalling data */
+	PSP_DC_ERROR_INVALIDSTATE				= 32106,	/* Invalid zhandle state */
+	PSP_DC_ERROR_NOAUTH						= 32107,	/* Not authenticated */
+	PSP_DC_ERROR_BADVERSION					= 32108,	/* Version conflict */
+	PSP_DC_ERROR_NOCHILDRENFOREPHEMERALS	= 32109,	/* Ephemeral nodes may not have children */
+	PSP_DC_ERROR_NODEEXISTS					= 32110,	/* The node already exists */
+	PSP_DC_ERROR_NOTEMPTY					= 32111,	/* The node has children */
+	PSP_DC_ERROR_SESSIONEXPIRED				= 32112,	/* The session has been expired by the server */
+	PSP_DC_ERROR_INVALIDCALLBACK			= 32113,	/* Invalid callback specified */
+	PSP_DC_ERROR_INVALIDACL					= 32114,	/* Invalid ACL specified */
+	PSP_DC_ERROR_AUTHFAILED					= 32115,	/* Client authentication failed */
+	PSP_DC_ERROR_CLOSING					= 32116,	/* ZooKeeper is closing */
+	PSP_DC_ERROR_NOTHING					= 32117,	/* (not error) no server responses to process */
+	PSP_DC_ERROR_SESSIONMOVED				= 32118,	/* session moved to another server, so operation is ignored */ 
+	PSP_DC_ERROR_API						= 32119,	/* API error */
+	PSP_DC_ERROR_LAST,
+
+	/* Personalized Storage Interface Error 33100*/
+	PSP_ERROR_GENERAL					= 33100,
+	PSP_ERROR_INVALID_PARA				= 33101,
+	PSP_ERROR_INVALID_PARA_VALUE		= 33102,
+	PSP_ERROR_LAST,
+
+};
+
+#endif	// __PSP_ERRORS_H__

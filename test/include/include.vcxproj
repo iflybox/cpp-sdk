@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{48BEC65E-90CD-4D4A-9C6D-20299E95E849}</ProjectGuid>
+    <RootNamespace>include</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="utils\aucodec.h" />
+    <ClInclude Include="utils\autobuf.h" />
+    <ClInclude Include="utils\cachelib.h" />
+    <ClInclude Include="utils\cfgunit.h" />
+    <ClInclude Include="utils\cfgunit_ini.h" />
+    <ClInclude Include="utils\cyclic_queue.h" />
+    <ClInclude Include="utils\endian_op.h" />
+    <ClInclude Include="utils\fast_mutex.hpp" />
+    <ClInclude Include="utils\fdstream.hpp" />
+    <ClInclude Include="utils\g711.h" />
+    <ClInclude Include="utils\hcrlib.h" />
+    <ClInclude Include="utils\idsslib.h" />
+    <ClInclude Include="utils\iFly_Dongle.h" />
+    <ClInclude Include="utils\instman.h" />
+    <ClInclude Include="utils\instman_pr.h" />
+    <ClInclude Include="utils\isrlib.h" />
+    <ClInclude Include="utils\isvlib.h" />
+    <ClInclude Include="utils\oslayer.hpp" />
+    <ClInclude Include="utils\ospath.hpp" />
+    <ClInclude Include="utils\proc.hpp" />
+    <ClInclude Include="utils\smutex.h" />
+    <ClInclude Include="utils\suconf.h" />
+    <ClInclude Include="utils\sulib.h" />
+    <ClInclude Include="utils\sutils.h" />
+    <ClInclude Include="utils\Task_Worker.h" />
+    <ClInclude Include="utils\ttslib.h" />
+    <ClInclude Include="log\calog.h" />
+    <ClInclude Include="log\iFly_Log.h" />
+    <ClInclude Include="log\log_asyn.h" />
+    <ClInclude Include="log\log_net_asyn.h" />
+    <ClInclude Include="log\srlog.h" />
+    <ClInclude Include="rec\ep.h" />
+    <ClInclude Include="rec\ftr.h" />
+    <ClInclude Include="rec\serr.h" />
+    <ClInclude Include="rec\sraud.h" />
+    <ClInclude Include="rec\srconf.h" />
+    <ClInclude Include="rec\srlang.h" />
+    <ClInclude Include="rec\srpara.h" />
+    <ClInclude Include="vad\wvad_api.h" />
+    <ClInclude Include="vad\wvad_err.h" />
+    <ClInclude Include="vad\wvad_type.h" />
+    <ClInclude Include="post\pproc_api.h" />
+    <ClInclude Include="dec\pre_api.h" />
+    <ClInclude Include="dec\rec_def.h" />
+    <ClInclude Include="dec\type_def.h" />
+    <ClInclude Include="dec\wfst_dc.h" />
+    <ClInclude Include="dec\wfst_dc_f.h" />
+    <ClInclude Include="dec\wrec_api.h" />
+    <ClInclude Include="dec\wrec_err.h" />
+    <ClInclude Include="dec\wrec_para.h" />
+    <ClInclude Include="dec\wrec_type.h" />
+    <ClInclude Include="sres\ac.h" />
+    <ClInclude Include="sres\audio.h" />
+    <ClInclude Include="sres\convert_endian.h" />
+    <ClInclude Include="sres\elist.hpp" />
+    <ClInclude Include="sres\res_helper.h" />
+    <ClInclude Include="sres\res_impl.h" />
+    <ClInclude Include="sres\sres.h" />
+    <ClInclude Include="sres\sres_head.h" />
+    <ClInclude Include="sres\srphone.h" />
+    <ClInclude Include="hbasext.h" />
+    <ClInclude Include="hdfsext.h" />
+    <ClInclude Include="iFlyDSFile.h" />
+    <ClInclude Include="iFlyPSP.h" />
+    <ClInclude Include="libdatahub.h" />
+    <ClInclude Include="msp_common.h" />
+    <ClInclude Include="msp_errors.h" />
+    <ClInclude Include="msp_types.h" />
+    <ClInclude Include="psp_errors.h" />
+    <ClInclude Include="qhcr.h" />
+    <ClInclude Include="qisr.h" />
+    <ClInclude Include="qisv.h" />
+    <ClInclude Include="qtts.h" />
+    <ClInclude Include="task_queue.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="utils\sutils.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

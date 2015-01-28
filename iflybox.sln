@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{99B1EA89-5678-455D-A4CC-EF1318D92602}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwiftClient", "swiftclient\SwiftClient.vcxproj", "{C812B0AE-E70F-4091-9A9F-A136E0F062AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tool", "tool", "{4E4BF1C5-B32B-4E34-81E5-0E85F777E87A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dstester", "test\dstester\dstester.vcxproj", "{F47CC839-72E7-42EA-9BC8-F704268C5C36}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Debug|Win32.Build.0 = Debug|Win32
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Debug|x64.ActiveCfg = Debug|x64
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Debug|x64.Build.0 = Debug|x64
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Release|Win32.ActiveCfg = Release|Win32
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Release|Win32.Build.0 = Release|Win32
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Release|x64.ActiveCfg = Release|x64
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD}.Release|x64.Build.0 = Release|x64
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Debug|Win32.Build.0 = Debug|Win32
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Debug|x64.ActiveCfg = Debug|x64
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Debug|x64.Build.0 = Debug|x64
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Release|Win32.ActiveCfg = Release|Win32
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Release|Win32.Build.0 = Release|Win32
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Release|x64.ActiveCfg = Release|x64
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C812B0AE-E70F-4091-9A9F-A136E0F062AD} = {99B1EA89-5678-455D-A4CC-EF1318D92602}
+		{F47CC839-72E7-42EA-9BC8-F704268C5C36} = {4E4BF1C5-B32B-4E34-81E5-0E85F777E87A}
+	EndGlobalSection
+EndGlobal
