@@ -1,5 +1,5 @@
-#ifndef __IFLYBOX__EXCEPTION_H__
-#define __IFLYBOX__EXCEPTION_H__
+#ifndef __CSSP__EXCEPTION_H__
+#define __CSSP__EXCEPTION_H__
 
 #include <exception>
 #include <string>
@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdexcept>
 
-namespace iflybox
+namespace cssp
 {
 
 	class iflyException 
@@ -66,4 +66,4 @@ namespace iflybox
 }
 
 
-#endif // __IFLYBOX__EXCEPTION_H__
+#endif // __CSSP__EXCEPTION_H__

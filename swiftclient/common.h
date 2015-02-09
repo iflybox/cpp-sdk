@@ -1,7 +1,7 @@
 
 
-#ifndef __IFLYBOX__COMMON_H__
-#define __IFLYBOX__COMMON_H__
+#ifndef __CSSP__COMMON_H__
+#define __CSSP__COMMON_H__
 #include <assert.h>
 #include <string>
 #include <map>
@@ -57,4 +57,4 @@ typedef		std::vector<XmlNodeDataMap>			XmlNodeVector;
 
 
 
-#endif // __IFLYBOX__COMMON_H__
+#endif // __CSSP__COMMON_H__

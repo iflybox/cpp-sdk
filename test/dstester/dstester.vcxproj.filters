@@ -16,7 +16,7 @@
     <Filter Include="MD5">
       <UniqueIdentifier>{3fb565e6-e985-47a6-9750-9ffb360fd2d7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="iflybox">
+    <Filter Include="cssp">
       <UniqueIdentifier>{53f96a99-79d0-4156-bf34-f6b781fe5af7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -57,14 +57,14 @@
     <ClInclude Include="md5lib.h">
       <Filter>MD5</Filter>
     </ClInclude>
-    <ClInclude Include="iflybox.h">
-      <Filter>iflybox</Filter>
-    </ClInclude>
-    <ClInclude Include="iflybox_svc.h">
-      <Filter>iflybox</Filter>
-    </ClInclude>
     <ClInclude Include="FileVerInfo.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cssp.h">
+      <Filter>cssp</Filter>
+    </ClInclude>
+    <ClInclude Include="cssp_svc.h">
+      <Filter>cssp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,8 +77,8 @@
     <ClCompile Include="md5lib.c">
       <Filter>MD5</Filter>
     </ClCompile>
-    <ClCompile Include="iflybox_svc.cpp">
-      <Filter>iflybox</Filter>
+    <ClCompile Include="cssp_svc.cpp">
+      <Filter>cssp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

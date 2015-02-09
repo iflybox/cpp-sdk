@@ -33,7 +33,7 @@ char* itoa(int value, char* result, int base) {
 }
 #endif
 					
-namespace iflybox
+namespace cssp
 {
 
 bool getline(std::string& stream, std::string& line){
@@ -61,7 +61,9 @@ void HttpHeader::deserialize(std::string& headStream){
 	while(getline(headStream, header)){
 		std::string::size_type pos = header.find(": ");
 		if(pos != std::string::npos){
-			headers_[header.substr(0, pos)] = header.substr(pos + strlen(": "), header.length());
+			std::string lower_key = header.substr(0, pos);
+			std::transform(lower_key.begin(), lower_key.end(), lower_key.begin(), std::tolower);
+			headers_[lower_key] = header.substr(pos + strlen(": "), header.length());
 		}
 	}
 }
@@ -89,7 +91,7 @@ void HttpRequest::init(){
 		curl_easy_setopt(curl_handle_, CURLOPT_URL, url_.c_str());
 	}
 	else
-		throw iflybox::iflyException(ERROR_LIBCUR_INIT, "curl_easy_init return NULL", __FILE__, __LINE__);
+		throw cssp::iflyException(ERROR_LIBCUR_INIT, "curl_easy_init return NULL", __FILE__, __LINE__);
 }
 
 HttpHeader HttpRequest::setheader(const HttpHeader& header){

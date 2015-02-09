@@ -4,14 +4,14 @@
 #include "error.h"
 #include "tinyxml/tinystr.h"
 #include "tinyxml/tinyxml.h"
-#include "iflybox.h"
+#include "cssp.h"
 #include "jsoncpp/json.h"
 #include <ctime>
 #include <math.h> 
 #ifndef UINT64_MAX
 #define UINT64_MAX (18446744073709551615ULL)
 #endif
-namespace iflybox
+namespace cssp
 {
 
 extern uint64_t atou64(const char* astr);
@@ -154,7 +154,7 @@ bool isUnsafe(char compareChar)
 }
 // PURPOSE OF THIS FUNCTION IS TO CONVERT A STRING 
 // TO URL ENCODE FORM.
-std::string URLEncode(std::string pcsEncode)
+std::string URLEncode(const std::string& pcsEncode)
 { 
 	int ichar_pos;
 	std::string csEncode;
@@ -189,8 +189,8 @@ std::string URLEncode(std::string pcsEncode)
 
 }
 
-SwiftClient::SwiftClient(const std::string& endpoint, const std::string& accessKeyId, const std::string& accessKeySecret, int endpoint_type, int timeout)
-	: auth_endpoint_(endpoint), accessKeyId_(accessKeyId), accessKeySecret_(accessKeySecret), endpoint_type_(endpoint_type), timeout_ms_(timeout)
+SwiftClient::SwiftClient(const std::string& containerUrl, const std::string& accessKeyId, const std::string& accessKeySecret, int timeout)
+	: containerUrl_(containerUrl), accessKeyId_(accessKeyId), accessKeySecret_(accessKeySecret), timeout_ms_(timeout)
 {
 	srand((unsigned)time(NULL));
 }
@@ -203,251 +203,12 @@ int SwiftClient::getTimeout(){
 	return timeout_ms_;
 }
 
-iflyboxResult SwiftClient::auth(){
-	iflyboxResult result;
-	//此处应该先进行keystone验证
-	try{
-		result = keystone(auth_endpoint_, accessKeyId_, accessKeySecret_, endpoint_type_);
-	}catch(const iflyException& e){
-		result.setStatus(e.error());
-	}
-	if(accessToken_.empty() || storageUrl_.empty()){
-		result = tempauth(auth_endpoint_, accessKeyId_, accessKeySecret_);
-	}
-	return result;
-}
 
-iflyboxResult SwiftClient::tempauth(const std::string& endpoint, const std::string& accessKeyId, const std::string& accessKeySecret){
+CSSPResult SwiftClient::containerExists(){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = endpoint;
-	httpHeader.append(X_AUTH_USER, accessKeyId);
-	httpHeader.append(X_AUTH_KEY, accessKeySecret);
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.getMethod(response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-		else{
-			 response.getHeader().get(X_AUTH_TOKEN, accessToken_);
-			 response.getHeader().get(X_STORAGE_URL, storageUrl_);
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "getMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-
-iflyboxResult SwiftClient::keystone(const std::string& endpoint, const std::string& accessKeyId, const std::string& accessKeySecret, int endpoint_type){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	Json::Value root_node, auth_node, passwordCredentials_node;
-	std::string tenantName, username;
-	//tenantName = accessKeyId.find(":", 0)
-	std::string::size_type pos = accessKeyId.find(":", 0);
-	if(pos == std::string::npos){
-		throw iflyException(ERROR_ACCESSKEYID_FORMATERR, "format error", __FILE__, __LINE__);
-	}
-	tenantName = accessKeyId.substr(0, pos);
-	username = accessKeyId.substr(pos + 1, accessKeyId.length());
-	auth_node["tenantName"] = Json::Value(tenantName);
-	passwordCredentials_node["username"] = Json::Value(username);
-	passwordCredentials_node["password"] = Json::Value(accessKeySecret);
-	auth_node["passwordCredentials"] = passwordCredentials_node;
-	root_node["auth"] = auth_node;
-	Json::FastWriter fast_writer;
-	std::string json_data = fast_writer.write(root_node);
-	HttpHeader httpHeader;
-	std::string urlRequst = endpoint;
-	httpHeader.append(X_OBJECT_CONTENT_TYPE, "application/json");
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.postMethod(json_data, response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-		else{
-			Json::Reader reader;
-			Json::Value json_object;
-			if( reader.parse(response.content_, json_object) == false){
-				throw iflyException(ERROR_JSON_PARSEFAILED, "json parse failed", __FILE__, __LINE__);
-			}
-			Json::Value access_node = json_object["access"];
-			if(access_node != Json::Value::null){
-				Json::Value token_node = access_node["token"];
-				Json::Value serviceCatalog_node = access_node["serviceCatalog"];
-				if(token_node != Json::Value::null){
-					Json::Value id_node = token_node["id"];
-					if(id_node != Json::Value::null){
-						accessToken_ = id_node.asString();
-					}
-				}
-				if(serviceCatalog_node != Json::Value::null){
-					Json::Value endpoints_node = serviceCatalog_node[Json::Value::UInt(0)]["endpoints"];
-					if(endpoints_node != Json::Value::null){
-						Json::Value publicURL_node = (!endpoint_type) ? endpoints_node[Json::Value::UInt(0)]["publicURL"]:endpoints_node[Json::Value::UInt(0)]["internalURL"];
-						if(publicURL_node != Json::Value::null){
-							storageUrl_ = publicURL_node.asString();
-						}
-					}
-				}
-			}
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "getMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-
-iflyboxResult SwiftClient::setAccountMetadata(const AccountMetadata& accountMetadata){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	std::string urlRequst = accountUrl();
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	for(std::map<std::string, std::string>::const_iterator iter = accountMetadata.account_meta_.begin(); iter != accountMetadata.account_meta_.end(); ++iter){
-		httpHeader.append(AccountMetadata::account_prefix_ + iter->first, iter->second);
-	}
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.postMethod("", response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "postMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-
- iflyboxResult SwiftClient::getAccountMetadata(AccountMetadata& metadata){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	HttpRequest request(accountUrl(), timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.headMethod(response);
-	metadata.clearMeta();
-	if(ccode == CURLE_OK){
-		metadata.parse(response.getHeader().headers_);
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "headMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-iflyboxResult SwiftClient::removeAccountMetadata(const AccountMetadata& removeMetadata){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	std::string urlRequst = accountUrl();
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	for(std::map<std::string, std::string>::const_iterator iter = removeMetadata.account_meta_.begin(); iter != removeMetadata.account_meta_.end(); ++iter){
-		httpHeader.append(AccountMetadata::account_remove_prefix_ + iter->first, iter->second);
-	}
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.postMethod("", response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "postMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-
-iflyboxResult SwiftClient::listContainers(int limit, const std::string& marker, std::vector<ContainerMetadata*>& metaVector){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	
-	std::string urlRequst = accountUrl() + ListFormatAndLimit;
-
-	char limit_str[INT_STR_LEN_MAX];
-	itoa(limit, limit_str, 10);
-	urlRequst += limit_str;
-	if(marker.empty() == false)
-	{
-		std::string markertmp;
-		markertmp = URLEncode(marker);
-		urlRequst += HttpParamMarker + markertmp;
-	}
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.getMethod(response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "getMethod exception!", __FILE__, __LINE__);
-	}
-	XmlNodeVector nodeVt;
-	parseXml(response.getContent(), nodeVt);
-	for(XmlNodeVector::iterator vt_iter = nodeVt.begin(); vt_iter != nodeVt.end(); ++vt_iter){
-		if((*vt_iter)["NodeType"] == "container"){
-			ContainerMetadata* containerMeta = new ContainerMetadata;
-			if(containerMeta)
-			{
-				containerMeta->setOwnerName((*vt_iter)["name"]);
-				containerMeta->container_sysdef_[X_CONTAINER_OBJECT_COUNT] = (*vt_iter)["count"];
-				containerMeta->container_sysdef_[X_CONTAINER_BYTES_USED] = (*vt_iter)["bytes"];
-				metaVector.push_back(containerMeta);
-			}
-		}
-	}
-	return result;
-}
-
-
-iflyboxResult SwiftClient::containerExists(const std::string& containertmp){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	HttpRequest request(urlRequst, timeout_ms_);
+	HttpRequest request(containerUrl_, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.headMethod(response);
@@ -465,68 +226,11 @@ iflyboxResult SwiftClient::containerExists(const std::string& containertmp){
 }
 
 
-iflyboxResult SwiftClient::createContainer(const std::string& containertmp){
+CSSPResult SwiftClient::deleteContainerIfEmpty(){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	//httpHeader.append(X_OBJECT_CONTENT_LENGTH, 0);
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.putMethod("", response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-iflyboxResult SwiftClient::createContainer(const std::string& containertmp, const ContainerMetadata& metadata){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	//httpHeader.append(X_OBJECT_CONTENT_LENGTH, "0");
-	for(MetadataMap::const_iterator iter = metadata.container_meta_.begin(); iter != metadata.container_meta_.end(); ++iter){
-		httpHeader.append(ContainerMetadata::container_prefix_ + iter->first, iter->second);
-	}
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.putMethod("", response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-
-iflyboxResult SwiftClient::deleteContainerIfEmpty(const std::string& containertmp){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	HttpRequest request(urlRequst, timeout_ms_);
+	HttpRequest request(containerUrl_, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.deleteMethod(response);
@@ -543,17 +247,14 @@ iflyboxResult SwiftClient::deleteContainerIfEmpty(const std::string& containertm
 	return result;
 }
 
-iflyboxResult SwiftClient::setContainerMetadata(const std::string& containertmp, const ContainerMetadata& containerMetadata){
+CSSPResult SwiftClient::setContainerMetadata(const ContainerMetadata& containerMetadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
 	for(MetadataMap::const_iterator iter = containerMetadata.container_meta_.begin(); iter != containerMetadata.container_meta_.end(); ++iter){
 		httpHeader.append(ContainerMetadata::container_prefix_ + iter->first, iter->second);
 	}
-	HttpRequest request(urlRequst, timeout_ms_);
+	HttpRequest request(containerUrl_, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.postMethod("", response);
@@ -570,14 +271,11 @@ iflyboxResult SwiftClient::setContainerMetadata(const std::string& containertmp,
 	return result;
 }
 
-iflyboxResult SwiftClient::getContainerMetadata(const std::string& containertmp, ContainerMetadata& metadata){
+CSSPResult SwiftClient::getContainerMetadata(ContainerMetadata& metadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	HttpRequest request(urlRequst, timeout_ms_);
+	HttpRequest request(containerUrl_, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.headMethod(response);
@@ -590,7 +288,6 @@ iflyboxResult SwiftClient::getContainerMetadata(const std::string& containertmp,
 		}
 		else{
 			metadata.parse(response.getHeader().headers_);
-			metadata.setOwnerName(container);
 		}
 	}
 	else{
@@ -600,17 +297,14 @@ iflyboxResult SwiftClient::getContainerMetadata(const std::string& containertmp,
 }
 
 
-iflyboxResult SwiftClient::removeContainerMetadata(const std::string& containertmp, const ContainerMetadata& removeMetadata){
+CSSPResult SwiftClient::removeContainerMetadata(const ContainerMetadata& removeMetadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string urlRequst = containerUrl(container);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
 	for(MetadataMap::const_iterator iter = removeMetadata.container_meta_.begin(); iter != removeMetadata.container_meta_.end(); ++iter){
 		httpHeader.append(ContainerMetadata::container_remove_prefix_ + iter->first, iter->second);
 	}
-	HttpRequest request(urlRequst, timeout_ms_);
+	HttpRequest request(containerUrl_, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.postMethod("", response);
@@ -627,16 +321,15 @@ iflyboxResult SwiftClient::removeContainerMetadata(const std::string& containert
 	return result;
 }
 
-iflyboxResult SwiftClient::listObjects(const std::string& containertmp, int limit, const std::string& prefixtmp, const std::string& delimitertmp, const std::string& markertmp, std::vector<ObjectMetadata*>& metaVector){
+CSSPResult SwiftClient::listObjects(int limit, const std::string& prefixtmp, const std::string& delimitertmp, const std::string& markertmp, std::vector<ObjectMetadata*>& metaVector){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
 	std::string prefix= URLEncode(prefixtmp);
 	std::string delimiter = URLEncode(delimitertmp);
 	std::string marker = URLEncode(markertmp);
 
-	std::string urlRequst = containerUrl(container) + ListFormatAndLimit;
+	std::string urlRequst = containerUrl_ + ListFormatAndLimit;
 	char limit_str[INT_STR_LEN_MAX];
 	itoa(limit, limit_str, 10);
 	urlRequst += limit_str;
@@ -649,7 +342,6 @@ iflyboxResult SwiftClient::listObjects(const std::string& containertmp, int limi
 	if(delimiter.empty() == false){
 		urlRequst += HttpParamDelimiter + delimiter;
 	}
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -694,14 +386,11 @@ iflyboxResult SwiftClient::listObjects(const std::string& containertmp, int limi
 
 
 
-iflyboxResult SwiftClient::objectExists(const std::string& containertmp, const std::string& objecttmp){
+CSSPResult SwiftClient::objectExists(const std::string& object){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = URLEncode(containertmp);
-	std::string object = URLEncode(objecttmp);
-	std::string urlRequst = storageUrl_ + "/" + container + "/" + object;
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
+	std::string urlRequst = containerUrl_ + "/" + URLEncode(object);
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -719,16 +408,13 @@ iflyboxResult SwiftClient::objectExists(const std::string& containertmp, const s
 	return result;
 }
 
-iflyboxResult SwiftClient::putObject(const std::string& container, const std::string& objectname, read_data_ptr putObjectCallback, void* inputstream, const char* md5, ObjectMetadata* outmetadata){
-	return putObject(storageUrl_ + "/" + container + "/" + objectname, putObjectCallback, inputstream, md5, outmetadata);
-}
 
-iflyboxResult SwiftClient::putObject(const std::string& pathtmp, read_data_ptr putObjectCallback, void* inputstream, const char* md5, ObjectMetadata* outmetadata){
+
+CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr putObjectCallback, void* inputstream, const char* md5, ObjectMetadata* outmetadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string path = URLEncode(pathtmp);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
+	std::string path = containerUrl_ + '/' + URLEncode(objectname);
 	if(md5){
 		httpHeader.append(X_OBJECT_ETAG, md5);
 	}
@@ -757,37 +443,12 @@ iflyboxResult SwiftClient::putObject(const std::string& pathtmp, read_data_ptr p
 	return result;
 }
 
-// iflyboxResult SwiftClient::putObject(const std::string& path, const SwiftObject& objectdata){
-// 	CURLcode ccode = CURLE_OK;
-// 	iflyboxResult result;
-// 	HttpHeader httpHeader;
-// 	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-// 	HttpRequest request(path);
-// 	request.setheader(httpHeader);
-// 	HttpResponse response;
-// 	ccode = request.putMethod(objectdata, response);
-// 	if(ccode == CURLE_OK){
-// 		result.setStatus(response.getStatus());
-// 		//如果不在2XX状态码内，需要填充content信息
-// 		if(response.getStatus() < 200 || response.getStatus() >= 300){
-// 			result.setDetail(response.getContent());
-// 		}
-// 	}
-// 	else{
-// 		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
-// 	}
-// 	return result;
-// }
 
- iflyboxResult SwiftClient::getObject(const std::string& containertmp, const std::string& objectnametmp, SwiftObject& object){
+ CSSPResult SwiftClient::getObject(const std::string& objectname, SwiftObject& object){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container= URLEncode(containertmp);
-	std::string objectname= URLEncode(objectnametmp);
-
-	std::string urlRequst = storageUrl_ + "/" + container + "/" + objectname;
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
+	std::string urlRequst = containerUrl_ + "/" + URLEncode(objectname);
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -810,11 +471,11 @@ iflyboxResult SwiftClient::putObject(const std::string& pathtmp, read_data_ptr p
 }
 
 
-iflyboxResult SwiftClient::getObject(const std::string& container, const std::string& objectname, write_data_ptr getObjectCallback, void* outputstream, uint64_t offset, int64_t& size, ObjectMetadata* outmetadata){
+CSSPResult SwiftClient::getObject(const std::string& objectname, write_data_ptr getObjectCallback, void* outputstream, uint64_t offset, int64_t& size, ObjectMetadata* outmetadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = URLEncode(storageUrl_ + "/" + container + "/" + objectname);
+	std::string urlRequst = URLEncode(containerUrl_ + "/" + objectname);
 	char range_begin[30];
 	char range_end[30];
 	std::string range = "bytes=";
@@ -827,7 +488,6 @@ iflyboxResult SwiftClient::getObject(const std::string& container, const std::st
 		range += u64toa(offset + size - 1, range_end);
 	}
 	httpHeader.append(X_RANGE, range);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -837,7 +497,6 @@ iflyboxResult SwiftClient::getObject(const std::string& container, const std::st
 	libcurl_stream.response_content = &response.content_;
 	libcurl_stream.user_stream = outputstream;
 	ccode = request.getMethod(&libcurl_stream, libcurl_writedata_function, response);
-//	ccode = request.getMethod(response);
 	if(ccode == CURLE_OK){
 		result.setStatus(response.getStatus());
 		//如果在2XX状态码内，需要填充content-length信息
@@ -856,17 +515,11 @@ iflyboxResult SwiftClient::getObject(const std::string& container, const std::st
 	return result;
 }
 
-
-iflyboxResult SwiftClient::removeObject(const std::string& container, const std::string& object){
-	return removeObject(storageUrl_ + "/" + container + "/" + object);
-}
-
-iflyboxResult SwiftClient::removeObject(const std::string& pathtmp){
+CSSPResult SwiftClient::removeObject(const std::string& object){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string path = URLEncode(pathtmp);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
+	std::string path = containerUrl_ + '/' + URLEncode(object);
 	std::string request_str = path + "?multipart-manifest=delete";
 	HttpRequest request(request_str, timeout_ms_);
 	request.setheader(httpHeader);
@@ -885,18 +538,13 @@ iflyboxResult SwiftClient::removeObject(const std::string& pathtmp){
 	return result;
 }
 
-iflyboxResult SwiftClient::copyObject(const std::string& sourceContainertmp, const std::string& sourceObjecttmp, const std::string& destinationContainertmp, const std::string& destinationObjecttmp){
+CSSPResult SwiftClient::copyObject(const std::string& sourceObject, const std::string& destinationObject){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string sourceContainer= URLEncode(sourceContainertmp);
-	std::string sourceObject= URLEncode(sourceObjecttmp);
-	std::string destinationContainer= URLEncode(destinationContainertmp);
-	std::string destinationObject= URLEncode(destinationObjecttmp);
-
-	std::string urlRequst = storageUrl_ + "/" + destinationContainer + "/" + destinationObject;
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	httpHeader.append(X_COPY_FROM, "/" + sourceContainer + "/" + sourceObject);
+	std::string container = containerUrl_.substr(containerUrl_.find_last_of('/') + 1);
+	std::string urlRequst = containerUrl_ + "/" + URLEncode(destinationObject);
+	httpHeader.append(X_COPY_FROM, "/" + container + "/" + URLEncode(sourceObject));
 	httpHeader.append(X_OBJECT_CONTENT_LENGTH, "0");
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
@@ -916,12 +564,11 @@ iflyboxResult SwiftClient::copyObject(const std::string& sourceContainertmp, con
 }
 
 
-iflyboxResult SwiftClient::setObjectMetadata(const std::string& container, const std::string& object, const ObjectMetadata& userMetadata){
+CSSPResult SwiftClient::setObjectMetadata(const std::string& object, const ObjectMetadata& userMetadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = URLEncode(storageUrl_ + "/" + container + "/" + object);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
+	std::string urlRequst = containerUrl_ + "/" + URLEncode(object);
 	for(std::map<std::string, std::string>::const_iterator iter = userMetadata.object_meta_.begin(); iter != userMetadata.object_meta_.end(); ++iter){
 		httpHeader.append(ObjectMetadata::object_prefix_ + iter->first, iter->second);
 	}
@@ -943,12 +590,11 @@ iflyboxResult SwiftClient::setObjectMetadata(const std::string& container, const
 }
 
 
-iflyboxResult SwiftClient::getObjectMetadata(const std::string& container, const std::string& object, ObjectMetadata& metadata){
+CSSPResult SwiftClient::getObjectMetadata(const std::string& object, ObjectMetadata& metadata){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = URLEncode(storageUrl_ + "/" + container + "/" + object);
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
+	std::string urlRequst = containerUrl_ + "/" + URLEncode(object);
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -962,7 +608,7 @@ iflyboxResult SwiftClient::getObjectMetadata(const std::string& container, const
 		}
 		else{
 			metadata.parse(response.getHeader().headers_);
-			metadata.setOwnerName(container + "/" + object);
+			metadata.setOwnerName(object);
 		}
 	}
 	else{
@@ -972,45 +618,18 @@ iflyboxResult SwiftClient::getObjectMetadata(const std::string& container, const
 }
 
 
-iflyboxResult SwiftClient::removeObjectMetadata(const std::string& container, const std::string& object, const ObjectMetadata& removeMetadata){
-	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
-	HttpHeader httpHeader;
-	std::string urlRequst = URLEncode(objectUrl(container, object));
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
-	for(std::map<std::string, std::string>::const_iterator iter = removeMetadata.object_meta_.begin(); iter != removeMetadata.object_meta_.end(); ++iter){
-		httpHeader.append(ObjectMetadata::object_remove_prefix_ + iter->first, iter->second);
-	}
-	HttpRequest request(urlRequst, timeout_ms_);
-	request.setheader(httpHeader);
-	HttpResponse response;
-	ccode = request.postMethod("", response);
-	if(ccode == CURLE_OK){
-		result.setStatus(response.getStatus());
-		//如果不在2XX状态码内，需要填充content信息
-		if(!is_ok(response.getStatus())){
-			result.setDetail(response.getContent());
-		}
-	}
-	else{
-		throw iflyCurlException(ccode, "postMethod exception!", __FILE__, __LINE__);
-	}
-	return result;
-}
-
-
-std::string SwiftClient::multipartUploadInit(const std::string& container, const std::string& object){
-	std::string upload_id = generateUploadId(container, object);
+std::string SwiftClient::multipartUploadInit(const std::string& object){
+	std::string upload_id = generateUploadId(object);
 	if(upload_id.empty() == false){
-		multi_uploads_[upload_id] = container + "/" + object;
+		multi_uploads_[upload_id] = object;
 	}
 	return upload_id;
 }
 
-iflyboxResult SwiftClient::multipartUploadPart(const std::string& upid, int partnumber, read_data_ptr putObjectCallback, void* inputstream, const char* md5){
+CSSPResult SwiftClient::multipartUploadPart(const std::string& upid, int partnumber, read_data_ptr putObjectCallback, void* inputstream, const char* md5){
 	CURLcode ccode = CURLE_OK;
 	HttpHeader httpHeader;
-	std::string urlRequst = storageUrl_;
+	std::string urlRequst = containerUrl_;
 	if(multi_uploads_.count(upid)){
 		urlRequst += "/" + multi_uploads_[upid] + "/" + upid + "/";
 	}
@@ -1024,7 +643,7 @@ iflyboxResult SwiftClient::multipartUploadPart(const std::string& upid, int part
 }
 
 
-iflyboxResult SwiftClient::multipartUploadListParts(const std::string& upid, int limit, const std::string& marker, std::vector<ObjectMetadata*>& metaVector){
+CSSPResult SwiftClient::multipartUploadListParts(const std::string& upid, int limit, const std::string& marker, std::vector<ObjectMetadata*>& metaVector){
 	CURLcode ccode = CURLE_OK;
 	HttpHeader httpHeader;
 	std::string fixpart, container, prefix;
@@ -1038,25 +657,24 @@ iflyboxResult SwiftClient::multipartUploadListParts(const std::string& upid, int
 	}
 	if(prefix.empty() || container.empty())
 		throw iflyException(ERROR_PARAM_WRONG, "prefix empty Or container empty.", __FILE__, __LINE__);
-	return listObjects(container, limit, prefix, "/", marker, metaVector);
+	return listObjects(limit, prefix, "/", marker, metaVector);
 }
 
 
-iflyboxResult SwiftClient::multipartUploadComplete(const std::string& upid){
+CSSPResult SwiftClient::multipartUploadComplete(const std::string& upid){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = storageUrl_;
+	std::string urlRequst = containerUrl_;
 	if(multi_uploads_.count(upid)){
-		urlRequst += "/" + multi_uploads_[upid];
-		urlRequst = URLEncode(urlRequst);
+		urlRequst += "/" + URLEncode(multi_uploads_[upid]);
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
 	}
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
 	//写入X-Object-Manifest
-	httpHeader.append(X_OBJECT_MANIFEST, URLEncode(multi_uploads_[upid] + "/" + upid + "/"));
+	std::string container = containerUrl_.substr(containerUrl_.find_last_of('/') + 1);
+	httpHeader.append(X_OBJECT_MANIFEST, container + '/' + URLEncode(multi_uploads_[upid])  + '/' + upid + '/');
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -1075,23 +693,22 @@ iflyboxResult SwiftClient::multipartUploadComplete(const std::string& upid){
 	return result;
 }
 
-iflyboxResult SwiftClient::multipartUploadAbort(const std::string& upid){
+CSSPResult SwiftClient::multipartUploadAbort(const std::string& upid){
 	CURLcode ccode = CURLE_OK;
-	iflyboxResult result;
+	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = storageUrl_;
+	std::string urlRequst;
 	std::string fixpart, container, object;
 	if(multi_uploads_.count(upid)){
 		fixpart = multi_uploads_[upid];
 		container = fixpart.substr(0, fixpart.find('/', 0));
 		object = fixpart.substr(fixpart.find('/', 0) + 1, fixpart.length());
-		urlRequst += "/" + container + "?path=" + object + "/" + upid;
+		urlRequst = containerUrl_ + "?path=" + object + "/" + upid;
 		urlRequst = URLEncode(urlRequst);
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
 	}
-	httpHeader.append(X_AUTH_TOKEN, accessToken_);
 	HttpRequest request(urlRequst, timeout_ms_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -1112,12 +729,12 @@ iflyboxResult SwiftClient::multipartUploadAbort(const std::string& upid){
 	std::string content = response.getContent();
 	while(getline(content, line)){
 		if(line.empty() == false)
-			removeObject(storageUrl_ + "/" + container + "/" + line);
+			removeObject(line);
 	}
 	return result;
 }
 
-std::string SwiftClient::generateUploadId(const std::string& container, const std::string& object){
+std::string SwiftClient::generateUploadId(const std::string& object){
 	time_t timer;
 	struct tm *tblock;
 	timer = time(NULL);
@@ -1131,16 +748,14 @@ std::string SwiftClient::generateUploadId(const std::string& container, const st
 	return upid;
 }
 
-std::string SwiftClient::accountUrl(){
-	return storageUrl_;
-}
+
 
 std::string SwiftClient::containerUrl(const std::string& container){
-	return storageUrl_ + "/" + container;
+	return containerUrl_;
 }
 
 std::string SwiftClient::objectUrl(const std::string& container, const std::string& object){
-	return storageUrl_ + "/" + container + "/" + object;
+	return containerUrl_ + '/' + object;
 }
 
 size_t SwiftClient::libcurl_writedata_function(void* buffer, size_t size, size_t nmemb, void* userp){
