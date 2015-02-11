@@ -154,8 +154,14 @@ namespace cssp{
 	CURLcode Sha1Request::postMethod(const std::string& data, HttpResponse& resp){
 		const std::string date = dataGMT();
 		this->header_.append("date", date);
+		std::string content_type;
+		//libcurl中会默认为post操作添加Content-Type:application/x-www-form-urlencoded
+		if(this->header_.get("Content-type", content_type) == false){
+			this->header_.append("Content-Type", "application/x-www-form-urlencoded");
+		}
 		std::string authorization = hmac_sha1("POST", date, this->accessKeyId_, this->accessKeySecret_);
 		this->header_.append("authorization", authorization);
+		
 		return HttpRequest::postMethod(data, resp);
 	}
 
