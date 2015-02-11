@@ -25,8 +25,10 @@ namespace cssp{
 
 	    CURLcode deleteMethod(HttpResponse& resp);
 	private:
-		std::string hmac_sha1(const std::string& method, const std::string& accessKeyId, const std::string& accessKeySecret);
-		std::string string_to_sign(const std::string& method);
+		std::string hmac_sha1(const std::string& method, const std::string& date, const std::string& accessKeyId, const std::string& accessKeySecret);
+		std::string string_to_sign(const std::string& method, const std::string& date);
+		std::string dataGMT();
+		int base64_encode(const char *str,int str_len,char *encode,int encode_len);
 	private:
 		std::string accessKeyId_;
 		std::string accessKeySecret_;

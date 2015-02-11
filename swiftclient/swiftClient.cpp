@@ -8,6 +8,7 @@
 #include "jsoncpp/json.h"
 #include <ctime>
 #include <math.h> 
+#include <clocale>
 #ifndef UINT64_MAX
 #define UINT64_MAX (18446744073709551615ULL)
 #endif
@@ -193,6 +194,9 @@ SwiftClient::SwiftClient(const std::string& containerUrl, const std::string& acc
 	: containerUrl_(containerUrl), accessKeyId_(accessKeyId), accessKeySecret_(accessKeySecret), timeout_ms_(timeout)
 {
 	srand((unsigned)time(NULL));
+	setlocale(LC_TIME, "en_US.UTF-8");
+	std::setlocale(LC_TIME, "en_US.UTF-8");
+	
 }
 
 void SwiftClient::setTimeout(int timeout){
@@ -208,7 +212,7 @@ CSSPResult SwiftClient::containerExists(){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	HttpRequest request(containerUrl_, timeout_ms_);
+	Sha1Request request(containerUrl_, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.headMethod(response);
@@ -230,7 +234,7 @@ CSSPResult SwiftClient::deleteContainerIfEmpty(){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	HttpRequest request(containerUrl_, timeout_ms_);
+	Sha1Request request(containerUrl_, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.deleteMethod(response);
@@ -254,7 +258,7 @@ CSSPResult SwiftClient::setContainerMetadata(const ContainerMetadata& containerM
 	for(MetadataMap::const_iterator iter = containerMetadata.container_meta_.begin(); iter != containerMetadata.container_meta_.end(); ++iter){
 		httpHeader.append(ContainerMetadata::container_prefix_ + iter->first, iter->second);
 	}
-	HttpRequest request(containerUrl_, timeout_ms_);
+	Sha1Request request(containerUrl_, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.postMethod("", response);
@@ -275,7 +279,7 @@ CSSPResult SwiftClient::getContainerMetadata(ContainerMetadata& metadata){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	HttpRequest request(containerUrl_, timeout_ms_);
+	Sha1Request request(containerUrl_, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.headMethod(response);
@@ -304,7 +308,7 @@ CSSPResult SwiftClient::removeContainerMetadata(const ContainerMetadata& removeM
 	for(MetadataMap::const_iterator iter = removeMetadata.container_meta_.begin(); iter != removeMetadata.container_meta_.end(); ++iter){
 		httpHeader.append(ContainerMetadata::container_remove_prefix_ + iter->first, iter->second);
 	}
-	HttpRequest request(containerUrl_, timeout_ms_);
+	Sha1Request request(containerUrl_, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.postMethod("", response);
@@ -342,7 +346,7 @@ CSSPResult SwiftClient::listObjects(int limit, const std::string& prefixtmp, con
 	if(delimiter.empty() == false){
 		urlRequst += HttpParamDelimiter + delimiter;
 	}
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.getMethod(response);
@@ -391,7 +395,7 @@ CSSPResult SwiftClient::objectExists(const std::string& object){
 	CSSPResult result;
 	HttpHeader httpHeader;
 	std::string urlRequst = containerUrl_ + "/" + URLEncode(object);
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.headMethod(response);
@@ -414,11 +418,11 @@ CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr p
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string path = containerUrl_ + '/' + URLEncode(objectname);
+	std::string urlRequst = containerUrl_ + '/' + URLEncode(objectname);
 	if(md5){
 		httpHeader.append(X_OBJECT_ETAG, md5);
 	}
-	HttpRequest request(path, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.putMethod(inputstream, putObjectCallback, response);
@@ -449,7 +453,7 @@ CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr p
 	CSSPResult result;
 	HttpHeader httpHeader;
 	std::string urlRequst = containerUrl_ + "/" + URLEncode(objectname);
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.getMethod(response);
@@ -488,7 +492,7 @@ CSSPResult SwiftClient::getObject(const std::string& objectname, write_data_ptr 
 		range += u64toa(offset + size - 1, range_end);
 	}
 	httpHeader.append(X_RANGE, range);
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	libcurl_write_struct libcurl_stream;
@@ -520,8 +524,8 @@ CSSPResult SwiftClient::removeObject(const std::string& object){
 	CSSPResult result;
 	HttpHeader httpHeader;
 	std::string path = containerUrl_ + '/' + URLEncode(object);
-	std::string request_str = path + "?multipart-manifest=delete";
-	HttpRequest request(request_str, timeout_ms_);
+	std::string urlRequst = path + "?multipart-manifest=delete";
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.deleteMethod(response);
@@ -546,7 +550,7 @@ CSSPResult SwiftClient::copyObject(const std::string& sourceObject, const std::s
 	std::string urlRequst = containerUrl_ + "/" + URLEncode(destinationObject);
 	httpHeader.append(X_COPY_FROM, "/" + container + "/" + URLEncode(sourceObject));
 	httpHeader.append(X_OBJECT_CONTENT_LENGTH, "0");
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.putMethod("", response);
@@ -572,7 +576,7 @@ CSSPResult SwiftClient::setObjectMetadata(const std::string& object, const Objec
 	for(std::map<std::string, std::string>::const_iterator iter = userMetadata.object_meta_.begin(); iter != userMetadata.object_meta_.end(); ++iter){
 		httpHeader.append(ObjectMetadata::object_prefix_ + iter->first, iter->second);
 	}
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.postMethod("", response);
@@ -595,7 +599,7 @@ CSSPResult SwiftClient::getObjectMetadata(const std::string& object, ObjectMetad
 	CSSPResult result;
 	HttpHeader httpHeader;
 	std::string urlRequst = containerUrl_ + "/" + URLEncode(object);
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	ccode = request.headMethod(response);
@@ -644,8 +648,6 @@ CSSPResult SwiftClient::multipartUploadPart(const std::string& upid, int partnum
 
 
 CSSPResult SwiftClient::multipartUploadListParts(const std::string& upid, int limit, const std::string& marker, std::vector<ObjectMetadata*>& metaVector){
-	CURLcode ccode = CURLE_OK;
-	HttpHeader httpHeader;
 	std::string fixpart, container, prefix;
 	if(multi_uploads_.count(upid)){
 		fixpart = multi_uploads_[upid];
@@ -675,7 +677,7 @@ CSSPResult SwiftClient::multipartUploadComplete(const std::string& upid){
 	//写入X-Object-Manifest
 	std::string container = containerUrl_.substr(containerUrl_.find_last_of('/') + 1);
 	httpHeader.append(X_OBJECT_MANIFEST, container + '/' + URLEncode(multi_uploads_[upid])  + '/' + upid + '/');
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	//Manifest文件必须为0字节
@@ -709,7 +711,7 @@ CSSPResult SwiftClient::multipartUploadAbort(const std::string& upid){
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
 	}
-	HttpRequest request(urlRequst, timeout_ms_);
+	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
 	//Manifest文件必须为0字节

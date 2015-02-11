@@ -111,6 +111,7 @@ CURLcode HttpRequest::getMethod(void* outputstream, write_data_ptr writeCallback
 	curl_easy_setopt(curl_handle_, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl_handle_, CURLOPT_TIMEOUT_MS, timeout_milsecs_);
 	curl_easy_setopt(curl_handle_, CURLOPT_HTTPGET, 1);
+	curl_easy_setopt(curl_handle_, CURLOPT_FOLLOWLOCATION, 1);
 	if(header_.getslist())
 		curl_easy_setopt(curl_handle_, CURLOPT_HTTPHEADER, header_.getslist());
 	ccode = curl_easy_perform(curl_handle_);
@@ -132,6 +133,7 @@ CURLcode HttpRequest::getMethod(HttpResponse& resp){
 	curl_easy_setopt(curl_handle_, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl_handle_, CURLOPT_TIMEOUT_MS, timeout_milsecs_);
 	curl_easy_setopt(curl_handle_, CURLOPT_HTTPGET, 1);
+	curl_easy_setopt(curl_handle_, CURLOPT_FOLLOWLOCATION, 1);
 	if(header_.getslist())
 		curl_easy_setopt(curl_handle_, CURLOPT_HTTPHEADER, header_.getslist());
 	ccode = curl_easy_perform(curl_handle_);
@@ -221,6 +223,7 @@ CURLcode HttpRequest::headMethod(HttpResponse& resp){
 	curl_easy_setopt(curl_handle_, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl_handle_, CURLOPT_TIMEOUT_MS, timeout_milsecs_);
 	curl_easy_setopt(curl_handle_, CURLOPT_NOBODY, 1);
+	curl_easy_setopt(curl_handle_, CURLOPT_FOLLOWLOCATION, 1);
 	if(header_.getslist())
 		curl_easy_setopt(curl_handle_, CURLOPT_HTTPHEADER, header_.getslist());
 	ccode = curl_easy_perform(curl_handle_);

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "metadata.h"
-#include "httpHelper.h"
+#include "sha1_request.h"
 #include "http_status_code.h"
 #include <sstream>
 

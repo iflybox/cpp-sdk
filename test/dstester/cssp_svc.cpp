@@ -132,8 +132,8 @@ int cssp_svc::on_cssp_put_object(const sc::par_arr & pars)
 #else
 	const char* object = pars.first_par_str_value();
 #endif
-	const char* srcpath = pars.third_par_str_value();
-	const char* md5 = pars.fourth_par_str_value();
+	const char* srcpath = pars.second_par_str_value();
+	const char* md5 = pars.third_par_str_value();
 	int status_code = 0;
 	double perf = 0;
 	
