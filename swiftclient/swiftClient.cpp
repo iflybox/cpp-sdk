@@ -224,7 +224,7 @@ CSSPResult SwiftClient::containerExists(){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "headMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("headMethod exception:" + containerUrl_).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -246,7 +246,7 @@ CSSPResult SwiftClient::deleteContainerIfEmpty(){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "deleteMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("deleteMethod exception:" + containerUrl_).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -270,7 +270,7 @@ CSSPResult SwiftClient::setContainerMetadata(const ContainerMetadata& containerM
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "postMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("postMethod exception:" + containerUrl_).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -295,7 +295,7 @@ CSSPResult SwiftClient::getContainerMetadata(ContainerMetadata& metadata){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "headMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("headMethod exception:" + containerUrl_).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -320,7 +320,7 @@ CSSPResult SwiftClient::removeContainerMetadata(const ContainerMetadata& removeM
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "postMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("postMethod exception:" + containerUrl_).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -358,7 +358,7 @@ CSSPResult SwiftClient::listObjects(int limit, const std::string& prefixtmp, con
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "getMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("getMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	XmlNodeVector nodeVt;
 	parseXml(response.getContent(), nodeVt);
@@ -407,7 +407,7 @@ CSSPResult SwiftClient::objectExists(const std::string& object){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "headMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("headMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -442,7 +442,7 @@ CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr p
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("putMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -469,7 +469,7 @@ CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr p
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "getMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("getMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -514,7 +514,7 @@ CSSPResult SwiftClient::getObject(const std::string& objectname, write_data_ptr 
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "getMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("getMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -537,7 +537,7 @@ CSSPResult SwiftClient::removeObject(const std::string& object){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "deleteMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("deleteMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -562,7 +562,7 @@ CSSPResult SwiftClient::copyObject(const std::string& sourceObject, const std::s
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("putMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -588,7 +588,7 @@ CSSPResult SwiftClient::setObjectMetadata(const std::string& object, const Objec
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "postMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("postMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -616,7 +616,7 @@ CSSPResult SwiftClient::getObjectMetadata(const std::string& object, ObjectMetad
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "headMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("headMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -633,31 +633,29 @@ std::string SwiftClient::multipartUploadInit(const std::string& object){
 CSSPResult SwiftClient::multipartUploadPart(const std::string& upid, int partnumber, read_data_ptr putObjectCallback, void* inputstream, const char* md5){
 	CURLcode ccode = CURLE_OK;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_;
+	std::string part_object;
 	if(multi_uploads_.count(upid)){
-		urlRequst += "/" + multi_uploads_[upid] + "/" + upid + "/";
+		part_object = multi_uploads_[upid] + "/" + upid + "/";
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
 	}
 	char szPartNumber[30];
 	itoa(partnumber, szPartNumber, 10);
-	urlRequst += szPartNumber;
-	return putObject(urlRequst, putObjectCallback, inputstream, md5, NULL);
+	part_object += szPartNumber;
+	return putObject(part_object, putObjectCallback, inputstream, md5, NULL);
 }
 
 
 CSSPResult SwiftClient::multipartUploadListParts(const std::string& upid, int limit, const std::string& marker, std::vector<ObjectMetadata*>& metaVector){
-	std::string fixpart, container, prefix;
+	std::string prefix;
 	if(multi_uploads_.count(upid)){
-		fixpart = multi_uploads_[upid];
-		container = fixpart.substr(0, fixpart.find('/', 0));
-		prefix = fixpart.substr(fixpart.find('/', 0) + 1, fixpart.length()) + "/" + upid + "/";
+		prefix = multi_uploads_[upid] + "/" + upid + "/";
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
 	}
-	if(prefix.empty() || container.empty())
+	if(prefix.empty())
 		throw iflyException(ERROR_PARAM_WRONG, "prefix empty Or container empty.", __FILE__, __LINE__);
 	return listObjects(limit, prefix, "/", marker, metaVector);
 }
@@ -667,9 +665,9 @@ CSSPResult SwiftClient::multipartUploadComplete(const std::string& upid){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_;
+	std::string urlRequst;
 	if(multi_uploads_.count(upid)){
-		urlRequst += "/" + URLEncode(multi_uploads_[upid]);
+		urlRequst = containerUrl_ + '/' + URLEncode(multi_uploads_[upid]);
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
@@ -690,7 +688,7 @@ CSSPResult SwiftClient::multipartUploadComplete(const std::string& upid){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("putMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }
@@ -702,10 +700,7 @@ CSSPResult SwiftClient::multipartUploadAbort(const std::string& upid){
 	std::string urlRequst;
 	std::string fixpart, container, object;
 	if(multi_uploads_.count(upid)){
-		fixpart = multi_uploads_[upid];
-		container = fixpart.substr(0, fixpart.find('/', 0));
-		object = fixpart.substr(fixpart.find('/', 0) + 1, fixpart.length());
-		urlRequst = containerUrl_ + "?path=" + object + "/" + upid;
+		urlRequst = containerUrl_ + "?path=" + multi_uploads_[upid] + "/" + upid;
 		urlRequst = URLEncode(urlRequst);
 	}
 	else{
@@ -724,7 +719,7 @@ CSSPResult SwiftClient::multipartUploadAbort(const std::string& upid){
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, "putMethod exception!", __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("putMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	//É¾³ýmultipart
 	std::string line, delurl;
