@@ -29,8 +29,11 @@
 #define		X_OBJECT_CONTENT_LENGTH		"content-length"
 #define		X_OBJECT_CONTENT_TYPE		"content-type"
 #define		X_COPY_FROM					"x-copy-from"
+#define     X_DESTINATION               "destination"
 #define		X_RANGE						"range"
 #define		X_OBJECT_MANIFEST			"x-object-manifest"
+#define		X_CONTAINER_READ			"x-container-read"
+#define		X_REMOVE_CONTAINER_READ		"x-remove-container-read"
 
 //int类型字符最大长度
 #define		INT_STR_LEN_MAX				12

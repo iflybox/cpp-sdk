@@ -176,6 +176,71 @@ typedef int (*Proc_cssp_list_object)(const CSSPHandle hdl, ObjectMetaHandle* met
 
 
 //************************************
+// method:	cssp_set_acl
+// brief:	设置container对应的ACL
+// access:	public 
+// returns:	int - 返回HTTP状态码.
+// param:	const CSSPHandle hdl	- [in]
+//          存储句柄
+// param:	int type	- [in]
+//			访问控制: CSSP_ACL_PUBLICRD, CSSP_ACL_PRIVATE, CSSP_ACL_LISTING
+// param:	const char * refer	- [in]
+//			refer黑白名单，黑白名单仅在CSSP_ACL_PUBLICRD和CSSP_ACL_LISTING下生效，若无需设置传递NULL
+//			其中以'-'字符开头为黑名单，其他的为白名单，黑白名单支持通配符，多个名单之间以','(逗号)分割
+//			例如： *.test.com,-black.test.com
+//			表示允许test域名下除了black以外的子域名对资源进行引用
+// param:	CSSPResult result	- [in,out]
+//			用于返回执行状态，如果为NULL则不返回执行状态
+// author:	zhengyao
+// remarks:	
+//************************************
+//公共读
+#define CSSP_ACL_PUBLICRD	1
+//私有读写
+#define CSSP_ACL_PRIVATE	2
+//公共读枚举(该权限包含公共读)
+#define CSSP_ACL_LISTING	4
+
+IFLYAPI int cssp_set_acl(const CSSPHandle hdl, int type, const char* refer, CSSPResult result);
+typedef int (*Proc_cssp_set_acl)(const CSSPHandle hdl, int type, const char* refer, CSSPResult result);
+
+
+//************************************
+// method:	cssp_set_containermeta
+// brief:	设置container metadata
+// access:	public 
+// returns:	int	- 返回HTTP状态码.
+// param:	const CSSPHandle hdl	- [in]
+//          存储句柄
+// param:	const ContainerMetaHandle metadata	- [in]
+//          待设置Container metadata信息
+// param:   CSSPResult result	- [in,out]
+//          用于返回执行状态，如果为NULL则不返回执行状态
+// author:	zhengyao
+// remarks:	
+//************************************
+IFLYAPI int cssp_set_containermeta(const CSSPHandle hdl, const ContainerMetaHandle metadata, CSSPResult result);
+typedef int (*Proc_cssp_set_containermeta)(const CSSPHandle hdl, const ContainerMetaHandle metadata, CSSPResult result);
+
+//************************************
+// method:	cssp_get_containermeta
+// brief:	获取container metadata
+// access:	public 
+// returns:	int	- 返回HTTP状态码.
+// param:	const CSSPHandle hdl	- [in]
+//          存储句柄
+// param:	ContainerMetaHandle  metadata	- [in,out]
+//          返回ContainerMeta
+// param:   CSSPResult result	- [in,out]
+//          用于返回执行状态，如果为NULL则不返回执行状态
+// author:	zhengyao
+// remarks:	
+//************************************
+IFLYAPI int cssp_get_containermeta(const CSSPHandle hdl, ContainerMetaHandle metadata, CSSPResult result);
+typedef int (*Proc_cssp_get_containermeta)(const CSSPHandle hdl, ContainerMetaHandle metadata, CSSPResult result);
+
+
+//************************************
 // method:  cssp_count_object
 // brief:   获取Container中object数量
 // access:  public 
@@ -373,6 +438,8 @@ typedef int (*Proc_cssp_remove_object)(const CSSPHandle hdl, const char* object,
 //			存储句柄
 // param:	const char * srcObject	- [in]
 //          源object名称
+// param:	const char * dstContainer	- [in]
+//          目标container名称
 // param:	const char * dstObject	- [in]
 //          目标object名称
 // param:   CSSPResult result	- [in,out]
@@ -380,8 +447,8 @@ typedef int (*Proc_cssp_remove_object)(const CSSPHandle hdl, const char* object,
 // author:	zhengyao
 // remarks:	
 //************************************
-IFLYAPI int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
-typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
+IFLYAPI int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
+typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
 
 
 //************************************
@@ -393,6 +460,8 @@ typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject
 //			存储句柄
 // param:	const char * srcObject	- [in]
 //          源object名称
+// param:	const char * dstContainer	- [in]
+//          目标container名称
 // param:	const char * dstObject	- [in]
 //          目标object名称
 // param:   CSSPResult result	- [in,out]
@@ -400,8 +469,8 @@ typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject
 // author:	zhengyao
 // remarks:	
 //************************************
-IFLYAPI int cssp_move_object(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
-typedef int (*Proc_cssp_move_object)(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
+IFLYAPI int cssp_move_object(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
+typedef int (*Proc_cssp_move_object)(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
 
 
 //************************************

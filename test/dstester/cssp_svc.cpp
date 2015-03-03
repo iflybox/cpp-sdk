@@ -257,19 +257,24 @@ int cssp_svc::on_cssp_copy_object(const sc::par_arr & pars)
 	char srcobject[1200];
 	code_convert("GBK", "UTF-8", srcobjecttmp, strlen(srcobjecttmp), srcobject, 1200);
 
-	const char* dstobjecttmp = pars.second_par_str_value();
+	const char* dstcontainertmp = pars.second_par_str_value();
+	char dstcontainer[1200];
+	code_convert("GBK", "UTF-8", dstcontainertmp, strlen(dstcontainertmp), dstcontainer, 1200);
+
+	const char* dstobjecttmp = pars.third_par_str_value();
 	char dstobject[1200];
 	code_convert("GBK", "UTF-8", dstobjecttmp, strlen(dstobjecttmp), dstobject, 1200);
 #else;
 	const char* srcobject = pars.first_par_str_value();
-	const char* dstobject = pars.second_par_str_value();
+	const char* dstcontainer = pars.second_par_str_value();
+	const char* dstobject = pars.third_par_str_value();
 #endif
 	
 	int status_code = 0;
 
 	dslog_perf_n(cssp_copy_object);
 	CSSPResult result = cssp_lib_.cssp_init_result()();
-	status_code = cssp_lib_.cssp_copy_object()(cssp_handle_, srcobject, dstobject, result);
+	status_code = cssp_lib_.cssp_copy_object()(cssp_handle_, srcobject, dstcontainer, dstobject, result);
 	double perf = dslog_perf_stop();
 	proc_resp_mngr().add_nsec("cssp_copy_object", perf);
 
@@ -294,19 +299,24 @@ int cssp_svc::on_cssp_move_object(const sc::par_arr & pars)
 	char srcobject[1200];
 	code_convert("GBK", "UTF-8", srcobjecttmp, strlen(srcobjecttmp), srcobject, 1200);
 
-	const char* dstobjecttmp = pars.second_par_str_value();
+	const char* dstcontainertmp = pars.second_par_str_value();
+	char dstcontainer[1200];
+	code_convert("GBK", "UTF-8", dstcontainertmp, strlen(dstcontainertmp), dstcontainer, 1200);
+
+	const char* dstobjecttmp = pars.third_par_str_value();
 	char dstobject[1200];
 	code_convert("GBK", "UTF-8", dstobjecttmp, strlen(dstobjecttmp), dstobject, 1200);
 #else;
 	const char* srcobject = pars.first_par_str_value();
-	const char* dstobject = pars.second_par_str_value();
+	const char* dstcontainer = pars.second_par_str_value();
+	const char* dstobject = pars.third_par_str_value();
 #endif
 
 	int status_code = 0;
 
 	dslog_perf_n(cssp_move_object);
 	CSSPResult result = cssp_lib_.cssp_init_result()();
-	status_code = cssp_lib_.cssp_move_object()(cssp_handle_, srcobject, dstobject, result);
+	status_code = cssp_lib_.cssp_move_object()(cssp_handle_, srcobject, dstcontainer, dstobject, result);
 	double perf = dslog_perf_stop();
 	proc_resp_mngr().add_nsec("cssp_move_object", perf);
 

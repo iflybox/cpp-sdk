@@ -24,6 +24,8 @@ namespace cssp{
 	    CURLcode headMethod(HttpResponse& resp);
 
 	    CURLcode deleteMethod(HttpResponse& resp);
+
+		CURLcode customMethod(const std::string& method, HttpResponse& resp);
 	private:
 		std::string hmac_sha1(const std::string& method, const std::string& date, const std::string& accessKeyId, const std::string& accessKeySecret);
 		std::string string_to_sign(const std::string& method, const std::string& date);

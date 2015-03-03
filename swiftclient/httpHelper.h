@@ -264,6 +264,7 @@ public:
 	static size_t writeContent(void* buffer, size_t size, size_t nmemb, void* userp);
 	static size_t readContent(void* buffer, size_t size, size_t nmemb, void* userp);
 protected:
+	CURLcode customMethod(const std::string& method, HttpResponse& resp);
     void init();
 protected:
 	//libcurl¾ä±ú

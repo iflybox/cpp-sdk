@@ -149,6 +149,56 @@ int cssp_list_object(const CSSPHandle hdl, ObjectMetaHandle* metahdls, int* limi
 	return ret;
 }
 
+int cssp_set_acl(const CSSPHandle hdl, int type, const char* refer, CSSPResult result){
+	IFLY_ASSERT(hdl);
+	int ret = IFLYBOX_SUCCESS;
+	std::string sysKey;
+	std::string sysValue = ".r:*";
+	if(CSSP_ACL_PUBLICRD == type || CSSP_ACL_LISTING == type){
+		sysKey = X_CONTAINER_READ;
+		if(CSSP_ACL_LISTING == type){
+			sysValue += ",.rlistings";
+		}
+		if(refer){
+			std::string refStr = refer;
+			std::string::size_type begin = 0;
+			std::string::size_type end = 0;
+			while(true){
+				end = refStr.find(',', begin);
+				if(std::string::npos == end){
+					break;
+				}
+				sysValue += ",.r:" + refStr.substr(begin, end - begin);
+				begin = end + 1;
+			}
+			sysValue += ",.r:" + refStr.substr(begin, std::string::npos);
+		}
+	}
+	else if(CSSP_ACL_PRIVATE == type){
+		sysKey = X_REMOVE_CONTAINER_READ;
+	}
+	else{
+		int ret = HTTP_PRECONDITION_FAILED;
+		cssp::CSSPResult iflyResult;
+		iflyResult.setStatus(HTTP_PRECONDITION_FAILED);
+		iflyResult.setDetail("Parameter Error: ACL Type invalid");
+		CSSP_ASSIGN_RESULT(result, iflyResult);
+		return ret;
+	}
+	SwiftClient* swiftClient = reinterpret_cast<SwiftClient*>(hdl);
+	try{
+		cssp::CSSPResult iflyResult = swiftClient->setContainerSysmeta(sysKey, sysValue);
+		CSSP_ASSIGN_RESULT(result, iflyResult);
+		ret = iflyResult.getStatus();
+	}catch(const cssp::iflyException& e){
+		IFLYBOX_EXTRACT_RESULT(result, e);
+		ret = e.error();
+	}
+	return ret;
+}
+
+
+
 int cssp_set_containermeta(const CSSPHandle hdl, const ContainerMetaHandle metadata, CSSPResult result){
 	IFLY_ASSERT(hdl);
 	int ret = IFLYBOX_SUCCESS;
@@ -308,14 +358,14 @@ int cssp_remove_object(const CSSPHandle hdl, const char* object, CSSPResult resu
 	return ret;
 }
 
-int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result){
+int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result){
 	IFLY_ASSERT(hdl);
 	IFLY_ASSERT(srcObject);
 	IFLY_ASSERT(dstObject);
 	int ret = IFLYBOX_SUCCESS;
 	SwiftClient* swiftClient = reinterpret_cast<SwiftClient*>(hdl);
 	try{
-		cssp::CSSPResult iflyResult = swiftClient->copyObject(srcObject, dstObject);
+		cssp::CSSPResult iflyResult = swiftClient->copyObject(srcObject, dstContainer, dstObject);
 		CSSP_ASSIGN_RESULT(result, iflyResult);
 		ret = iflyResult.getStatus();
 	}catch(const cssp::iflyException& e){
@@ -325,14 +375,14 @@ int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* ds
 	return ret;
 }
 
-int cssp_move_object(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result){
+int cssp_move_object(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result){
 	IFLY_ASSERT(hdl);
 	IFLY_ASSERT(srcObject);
 	IFLY_ASSERT(dstObject);
 	int ret = IFLYBOX_SUCCESS;
 	SwiftClient* swiftClient = reinterpret_cast<SwiftClient*>(hdl);
 	try{
-		cssp::CSSPResult iflyResult = swiftClient->copyObject(srcObject, dstObject);
+		cssp::CSSPResult iflyResult = swiftClient->copyObject(srcObject, dstContainer, dstObject);
 		if(iflyResult.getStatus() >= HTTP_OK && iflyResult.getStatus() < HTTP_MULTIPLE_CHOICES){
 			iflyResult = swiftClient->removeObject(srcObject);
 		}

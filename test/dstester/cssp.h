@@ -373,6 +373,8 @@ typedef int (*Proc_cssp_remove_object)(const CSSPHandle hdl, const char* object,
 //			存储句柄
 // param:	const char * srcObject	- [in]
 //          源object名称
+// param:	const char * dstContainer	- [in]
+//          目标container名称
 // param:	const char * dstObject	- [in]
 //          目标object名称
 // param:   CSSPResult result	- [in,out]
@@ -380,8 +382,8 @@ typedef int (*Proc_cssp_remove_object)(const CSSPHandle hdl, const char* object,
 // author:	zhengyao
 // remarks:	
 //************************************
-IFLYAPI int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
-typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
+IFLYAPI int cssp_copy_object(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
+typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
 
 
 //************************************
@@ -393,6 +395,8 @@ typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject
 //			存储句柄
 // param:	const char * srcObject	- [in]
 //          源object名称
+// param:	const char * dstContainer	- [in]
+//          目标container名称
 // param:	const char * dstObject	- [in]
 //          目标object名称
 // param:   CSSPResult result	- [in,out]
@@ -400,8 +404,8 @@ typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject
 // author:	zhengyao
 // remarks:	
 //************************************
-IFLYAPI int cssp_move_object(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
-typedef int (*Proc_cssp_move_object)(const CSSPHandle hdl, const char* srcObject, const char* dstObject, CSSPResult result);
+IFLYAPI int cssp_move_object(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
+typedef int (*Proc_cssp_move_object)(const CSSPHandle hdl, const char* srcObject, const char* dstContainer, const char* dstObject, CSSPResult result);
 
 
 //************************************

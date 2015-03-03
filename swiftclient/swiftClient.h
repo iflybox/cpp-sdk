@@ -71,6 +71,20 @@ public:
 	CSSPResult	deleteContainerIfEmpty();
 
 	//************************************
+	// method:	setContainerSysmeta
+	// brief:	设置或移除container的系统数据
+	// access:	public 
+	// returns:	CSSPResult
+	// param:	const std::string & sysKey	- []
+	// param:	const std::string & sysValue	- []
+	// author:	zhengyao
+	// remarks:	该函数可同时提供设置或移除功能，通过sysKey来定义功能
+	//			例如X-Container-* 和X-Remove-Container-* 分别表示设置和移除
+	//************************************
+	CSSPResult setContainerSysmeta(const std::string& sysKey, const std::string& sysValue);
+
+
+	//************************************
 	// method:    setContainerMetadata
 	// brief：    设置container的metainfo
 	// access:    public 
@@ -193,15 +207,16 @@ public:
 
 	//************************************
 	// method:	copyObject
-	// brief:	拷贝object
+	// brief:	cssp::SwiftClient::copyObject
 	// access:	public 
-	// returns:	cssp::CSSPResult
-	// param:	const std::string & sourceObject	- [in]
-	// param:	const std::string & destinationObject	- [in]
+	// returns:	CSSPResult
+	// param:	const std::string & srcObject	- []
+	// param:	const std::string & dstContainer	- []
+	// param:	const std::string & dstObject	- []
 	// author:	zhengyao
 	// remarks:	
 	//************************************
-	CSSPResult	copyObject(const std::string& sourceObject, const std::string& destinationObject);
+	CSSPResult	copyObject(const std::string& srcObject, const std::string& dstContainer, const std::string& dstObject);
 	
 
 	//************************************

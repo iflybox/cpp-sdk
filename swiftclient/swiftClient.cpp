@@ -251,6 +251,28 @@ CSSPResult SwiftClient::deleteContainerIfEmpty(){
 	return result;
 }
 
+CSSPResult SwiftClient::setContainerSysmeta(const std::string& sysKey, const std::string& sysValue){
+	CURLcode ccode = CURLE_OK;
+	CSSPResult result;
+	HttpHeader httpHeader;
+	httpHeader.append(sysKey, sysValue);
+	Sha1Request request(containerUrl_, timeout_ms_, accessKeyId_, accessKeySecret_);
+	request.setheader(httpHeader);
+	HttpResponse response;
+	ccode = request.postMethod("", response);
+	if(ccode == CURLE_OK){
+		result.setStatus(response.getStatus());
+		//如果不在2XX状态码内，需要填充content信息
+		if(!is_ok(response.getStatus())){
+			result.setDetail(response.getContent());
+		}
+	}
+	else{
+		throw iflyCurlException(ccode, ("postMethod exception:" + containerUrl_).c_str(), __FILE__, __LINE__);
+	}
+	return result;
+}
+
 CSSPResult SwiftClient::setContainerMetadata(const ContainerMetadata& containerMetadata){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
@@ -542,18 +564,17 @@ CSSPResult SwiftClient::removeObject(const std::string& object){
 	return result;
 }
 
-CSSPResult SwiftClient::copyObject(const std::string& sourceObject, const std::string& destinationObject){
+CSSPResult SwiftClient::copyObject(const std::string& srcObject, const std::string& dstContainer, const std::string& dstObject){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string container = containerUrl_.substr(containerUrl_.find_last_of('/') + 1);
-	std::string urlRequst = containerUrl_ + "/" + URLEncode(destinationObject);
-	httpHeader.append(X_COPY_FROM, "/" + container + "/" + URLEncode(sourceObject));
+	std::string urlRequst = containerUrl_ + "/" + URLEncode(srcObject);
+	httpHeader.append(X_DESTINATION, dstContainer + "/" + URLEncode(dstObject));
 	httpHeader.append(X_OBJECT_CONTENT_LENGTH, "0");
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
-	ccode = request.putMethod("", response);
+	ccode = request.customMethod("COPY", response);
 	if(ccode == CURLE_OK){
 		result.setStatus(response.getStatus());
 		//如果不在2XX状态码内，需要填充content信息
@@ -562,7 +583,7 @@ CSSPResult SwiftClient::copyObject(const std::string& sourceObject, const std::s
 		}
 	}
 	else{
-		throw iflyCurlException(ccode, ("putMethod exception:" + urlRequst).c_str(), __FILE__, __LINE__);
+		throw iflyCurlException(ccode, ("customMethod COPY exception:" + urlRequst).c_str(), __FILE__, __LINE__);
 	}
 	return result;
 }

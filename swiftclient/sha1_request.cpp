@@ -180,4 +180,12 @@ namespace cssp{
 		this->header_.append("authorization", authorization);
 		return HttpRequest::deleteMethod(resp);
 	}
+	
+	CURLcode Sha1Request::customMethod(const std::string& method, HttpResponse& resp){
+		const std::string date = dataGMT();
+		this->header_.append("date", date);
+		std::string authorization = hmac_sha1(method, date, this->accessKeyId_, this->accessKeySecret_);
+		this->header_.append("authorization", authorization);
+		return HttpRequest::customMethod(method, resp);
+	}
 }

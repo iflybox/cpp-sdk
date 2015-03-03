@@ -234,13 +234,18 @@ CURLcode HttpRequest::headMethod(HttpResponse& resp){
 	return ccode;
 }
 
+
 CURLcode HttpRequest::deleteMethod(HttpResponse& resp){
+	return customMethod("DELETE", resp);
+}
+
+CURLcode HttpRequest::customMethod(const std::string& method, HttpResponse& resp){
 	CURLcode ccode = CURLE_OK;
 	curl_easy_setopt(curl_handle_, CURLOPT_WRITEFUNCTION, HttpRequest::writeContent);  
 	curl_easy_setopt(curl_handle_, CURLOPT_WRITEDATA, (void *)&resp.content_);
 	curl_easy_setopt(curl_handle_, CURLOPT_NOSIGNAL, 1);
 	curl_easy_setopt(curl_handle_, CURLOPT_TIMEOUT_MS, timeout_milsecs_);
-	curl_easy_setopt(curl_handle_, CURLOPT_CUSTOMREQUEST, "DELETE");  
+	curl_easy_setopt(curl_handle_, CURLOPT_CUSTOMREQUEST, method.c_str());  
 	if(header_.getslist())
 		curl_easy_setopt(curl_handle_, CURLOPT_HTTPHEADER, header_.getslist());
 	ccode = curl_easy_perform(curl_handle_);
@@ -248,6 +253,8 @@ CURLcode HttpRequest::deleteMethod(HttpResponse& resp){
 		curl_easy_getinfo(curl_handle_, CURLINFO_RESPONSE_CODE, &resp.status_);
 	return ccode;
 }
+
+
 
 
 
