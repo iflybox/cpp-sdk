@@ -9,7 +9,7 @@
 #include "thr_mngr.h"
 #include "dum_svc.h"
 #include "dstester_log.h"
-#include "iflybox_svc.h"
+#include "cssp_svc.h"
 
 #ifdef WIN32
 #define _CRTDBG_MAP_ALLOC
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 
 	// 结尾不需要分号
 	IDSS_BEGIN()
-		IDSS_RUNTEST(iflybox)
+		IDSS_RUNTEST(cssp)
 	IDSS_END()
 
 #ifdef WIN32

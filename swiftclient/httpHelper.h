@@ -1,15 +1,16 @@
-#ifndef __IFLYBOX__HTTPHELPER_H__
-#define __IFLYBOX__HTTPHELPER_H__
+#ifndef __CSSP__HTTPHELPER_H__
+#define __CSSP__HTTPHELPER_H__
 
 #include "common.h"
 #include "curl/curl.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <algorithm>
 
 char* itoa(int value, char* result, int base);
 
-namespace iflybox
+namespace cssp
 {
 	typedef size_t (*read_data_ptr)(void* buffer, size_t size, size_t nmemb, void* inputstream);
 	typedef size_t (*write_data_ptr)(void* buffer, size_t size, size_t nmemb, void* inputstream);
@@ -49,7 +50,9 @@ public:
     // remarks:   函数默认拼接header项为："key:value"
     //************************************
     void append(const std::string& key, const std::string& value){
-		headers_[key] = value;
+		std::string lower_key = key;
+		std::transform(lower_key.begin(), lower_key.end(), lower_key.begin(), std::tolower);
+		headers_[lower_key] = value;
     }
     //************************************
     // method:    append
@@ -88,7 +91,9 @@ public:
 	// remarks:	
 	//************************************
 	bool get(const std::string& key, std::string& value)const{
-		HttpHeaderMap::const_iterator iter = headers_.find(key);
+		std::string lower_key = key;
+		std::transform(lower_key.begin(), lower_key.end(), lower_key.begin(), std::tolower);
+		HttpHeaderMap::const_iterator iter = headers_.find(lower_key);
 		if(iter != headers_.end()){
 			value = iter->second;
 			return true;
@@ -160,7 +165,7 @@ public:
     // method:	setheader
     // brief:	设置请求的头域
     // access:	public  
-    // returns:	iflybox::HttpHeader - 
+    // returns:	cssp::HttpHeader - 
     // param:	const HttpHeader & header	- [in]
     // author:	zhengyao
     // remarks:	
@@ -259,8 +264,9 @@ public:
 	static size_t writeContent(void* buffer, size_t size, size_t nmemb, void* userp);
 	static size_t readContent(void* buffer, size_t size, size_t nmemb, void* userp);
 protected:
+	CURLcode customMethod(const std::string& method, HttpResponse& resp);
     void init();
-private:
+protected:
 	//libcurl句柄
     CURL*           curl_handle_;
 	//请求对应的url地址
@@ -278,4 +284,4 @@ private:
 
 
 
-#endif // __IFLYBOX__HTTPHELPER_H__
+#endif // __CSSP__HTTPHELPER_H__

@@ -1,5 +1,5 @@
-#ifndef __IFLYBOX__METADATA_H__
-#define __IFLYBOX__METADATA_H__
+#ifndef __CSSP__METADATA_H__
+#define __CSSP__METADATA_H__
 
 
 #include <stdint.h>
@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-namespace iflybox
+namespace cssp
 {
 
 
@@ -91,4 +91,4 @@ public:
 
 }
 
-#endif // __IFLYBOX__METADATA_H__
+#endif // __CSSP__METADATA_H__

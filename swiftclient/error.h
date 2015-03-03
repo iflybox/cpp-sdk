@@ -1,5 +1,5 @@
-#ifndef __IFLYBOX__ERROR_H__
-#define __IFLYBOX__ERROR_H__
+#ifndef __CSSP__ERROR_H__
+#define __CSSP__ERROR_H__
 
 #define IFLYBOX_SUCCESS         200
 #define SERVICE_PREFIX          0
@@ -27,4 +27,4 @@
 //…Í«Îƒ⁄¥Ê¥ÌŒÛ
 #define ERROR_MALLOC_BAD				ERROR_PREFIX_COMMON + 7
 
-#endif // __IFLYBOX__ERROR_H__
+#endif // __CSSP__ERROR_H__

@@ -198,12 +198,12 @@ copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)..\bin\$(Platform)\$(TargetN
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="asc_parser.h" />
+    <ClInclude Include="cssp.h" />
     <ClInclude Include="dstester_cfg.h" />
     <ClInclude Include="dstester_log.h" />
     <ClInclude Include="dum_svc.h" />
     <ClInclude Include="FileVerInfo.h" />
-    <ClInclude Include="iflybox.h" />
-    <ClInclude Include="iflybox_svc.h" />
+    <ClInclude Include="cssp_svc.h" />
     <ClInclude Include="md5lib.h" />
     <ClInclude Include="proc_resp.h" />
     <ClInclude Include="resource.h" />
@@ -215,7 +215,7 @@ copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)..\bin\$(Platform)\$(TargetN
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dstester.cpp" />
-    <ClCompile Include="iflybox_svc.cpp" />
+    <ClCompile Include="cssp_svc.cpp" />
     <ClCompile Include="md5lib.c" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
