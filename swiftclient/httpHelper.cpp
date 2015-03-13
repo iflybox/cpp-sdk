@@ -32,6 +32,128 @@ char* itoa(int value, char* result, int base) {
     return result;
 }
 #endif
+
+char hexVals[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+// UNSAFE String
+std::string csUnsafeString= "% ";
+std::string decToHex(char,int);
+// PURPOSE OF THIS FUNCTION IS TO CONVERT A GIVEN CHAR TO URL HEX FORM
+std::string convert(char val) 
+{
+	std::string csRet;
+	csRet += "%";
+	csRet += decToHex(val, 16); 
+	return  csRet;
+}
+
+// THIS IS A HELPER FUNCTION.
+// PURPOSE OF THIS FUNCTION IS TO GENERATE A HEX REPRESENTATION OF GIVEN CHARACTER
+std::string decToHex(char num, int radix)
+{ 
+	int temp=0; 
+	std::string csTmp;
+	int num_char;
+	num_char = (int) num;
+
+	// ISO-8859-1 
+	// IF THE IF LOOP IS COMMENTED, THE CODE WILL FAIL TO GENERATE A 
+	// PROPER URL ENCODE FOR THE CHARACTERS WHOSE RANGE IN 127-255(DECIMAL)
+	if (num_char < 0)
+		num_char = 256 + num_char;
+
+	while (num_char >= radix)
+	{
+		temp = num_char % radix;
+		num_char = (int)floor((double)(num_char / radix));
+		csTmp = hexVals[temp];
+	}
+
+	csTmp += hexVals[num_char];
+
+	if(csTmp.length() < 2)
+	{
+		csTmp += '0';
+	}
+
+	std::string strdecToHex = "";
+	// Reverse the String
+	for (int i = csTmp.length() - 1 ; i >= 0; --i)
+	{
+		strdecToHex += csTmp[i]; 
+	}
+
+	return strdecToHex;
+}
+
+// PURPOSE OF THIS FUNCTION IS TO CHECK TO SEE IF A CHAR IS URL UNSAFE.
+// TRUE = UNSAFE, FALSE = SAFE
+bool isUnsafe(char compareChar)
+{
+	bool bcharfound = false;
+	char tmpsafeChar;
+	int m_strLen = 0;
+
+	m_strLen = csUnsafeString.length();
+	for(int ichar_pos = 0; ichar_pos < m_strLen ;ichar_pos++)
+	{
+		tmpsafeChar = csUnsafeString.at(ichar_pos); 
+		if(tmpsafeChar == compareChar)
+		{ 
+			bcharfound = true;
+			break;
+		} 
+	}
+	int char_ascii_value = 0;
+	//char_ascii_value = __toascii(compareChar);
+	char_ascii_value = (int) compareChar;
+
+	if(bcharfound == false &&  char_ascii_value > 32 && char_ascii_value < 123)
+	{
+		return false;
+	}
+	// found no unsafe chars, return false  
+	else
+	{
+		return true;
+	}
+
+	return true;
+}
+
+
+// PURPOSE OF THIS FUNCTION IS TO CONVERT A STRING 
+// TO URL ENCODE FORM.
+std::string URLEncode(const std::string& pcsEncode)
+{ 
+	int ichar_pos;
+	std::string csEncode;
+	std::string csEncoded; 
+	int m_length;
+	int ascii_value;
+
+	csEncode = pcsEncode;
+	m_length = csEncode.length();
+
+	for(ichar_pos = 0; ichar_pos < m_length; ichar_pos++)
+	{
+		char ch = csEncode.at(ichar_pos);
+		if (ch < ' ') 
+		{
+			ch = ch;
+		}  
+		if(!isUnsafe(ch))
+		{
+			// Safe Character    
+			csEncoded += ch;
+		}
+		else
+		{
+			// get Hex Value of the Character
+			csEncoded += convert(ch);
+		}
+	}
+	return csEncoded;
+}
 					
 namespace cssp
 {
@@ -88,7 +210,7 @@ void HttpRequest::init(){
 	if(curl_handle_)
 	{
 //		char *url = curl_easy_escape( curl_handle_ , url_.c_str() , url_.length());
-		curl_easy_setopt(curl_handle_, CURLOPT_URL, url_.c_str());
+		curl_easy_setopt(curl_handle_, CURLOPT_URL, URLEncode(url_).c_str());
 	}
 	else
 		throw cssp::iflyException(ERROR_LIBCUR_INIT, "curl_easy_init return NULL", __FILE__, __LINE__);
