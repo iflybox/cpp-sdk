@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)\bin\x86</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-f  dstester.cfg  -s  cssp-bvt/copy-object.scp</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-f  dstester.cfg  -s  cssp-bvt/put.scp</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)iflybox\bin64</LocalDebuggerWorkingDirectory>

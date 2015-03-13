@@ -138,7 +138,7 @@ typedef int (*Proc_cssp_release_instance)(CSSPHandle hdl);
 // remarks:   
 //************************************
 IFLYAPI int cssp_set_timeout(CSSPHandle hdl, int timeout);
-typedef int (*Proc_cssp_set_timeout)(CSSPHandle hdl);
+typedef int (*Proc_cssp_set_timeout)(CSSPHandle hdl, int timeout);
 
 
 
@@ -288,7 +288,7 @@ typedef int (*Proc_cssp_count_bytesused)(const CSSPHandle hdl, uint64_t* count, 
 // param:   const CSSPHandle hdl  - [in]
 //          存储句柄  
 // param:   const char * object - [in]
-//          Object名称
+//          Object名称(必须为UTF8编码)
 // param:   CSSPResult result	- [in,out]
 //          用于返回执行状态，如果为NULL则不返回执行状态
 // author:  zhengyao
@@ -328,7 +328,7 @@ typedef size_t (*Proc_cssp_put_object_fromdisk_callback)(void* buffer, size_t si
 // param:   const CSSPHandle hdl  - [in]
 //          存储句柄
 // param:   const char * object	- [in]
-//          Object名称
+//          Object名称(必须为UTF8编码)
 // param:   cssp_put_object_callback putObjectCallback - [in]
 //          上传回调函数(如果传递NULL，则会调用默认回调函数将inputstream和size指代数据上传)
 // param:   void * inputstream  - [in]
@@ -390,7 +390,7 @@ typedef size_t (*Proc_cssp_get_object_todisk_callback)(void* buffer, size_t size
 // param:   const CSSPHandle hdl    - [in]
 //          存储句柄
 // param:   const char * object - [in]
-//          Object名称
+//          Object名称(必须为UTF8编码)
 // param:   cssp_get_object_callback getObjectCallback - [in]
 //          下载回调函数(如果传递NULL，则会调用默认回调函数将数据下载后写入outputstream和size指代的数据流)
 // param:   void * outputstream  - [in,out]
@@ -420,7 +420,7 @@ typedef int (*Proc_cssp_get_object)(const CSSPHandle hdl, const char* object, cs
 // param:	const CSSPHandle hdl	- [in]
 //          存储句柄
 // param:	const char * object	- [in]
-//          Object名称
+//          Object名称(必须为UTF8编码)
 // param:   CSSPResult result	- [in,out]
 //          用于返回执行状态，如果为NULL则不返回执行状态
 // author:	zhengyao
@@ -437,11 +437,11 @@ typedef int (*Proc_cssp_remove_object)(const CSSPHandle hdl, const char* object,
 // param:	const CSSPHandle hdl	- [in]
 //			存储句柄
 // param:	const char * srcObject	- [in]
-//          源object名称
+//          源object名称(必须为UTF8编码)
 // param:	const char * dstContainer	- [in]
 //          目标container名称
 // param:	const char * dstObject	- [in]
-//          目标object名称
+//          目标object名称(必须为UTF8编码)
 // param:   CSSPResult result	- [in,out]
 //          用于返回执行状态，如果为NULL则不返回执行状态
 // author:	zhengyao
@@ -459,11 +459,11 @@ typedef int (*Proc_cssp_copy_object)(const CSSPHandle hdl, const char* srcObject
 // param:	const CSSPHandle hdl	- [in]
 //			存储句柄
 // param:	const char * srcObject	- [in]
-//          源object名称
+//          源object名称(必须为UTF8编码)
 // param:	const char * dstContainer	- [in]
 //          目标container名称
 // param:	const char * dstObject	- [in]
-//          目标object名称
+//          目标object名称(必须为UTF8编码)
 // param:   CSSPResult result	- [in,out]
 //          用于返回执行状态，如果为NULL则不返回执行状态
 // author:	zhengyao
@@ -481,7 +481,7 @@ typedef int (*Proc_cssp_move_object)(const CSSPHandle hdl, const char* srcObject
 // param:	const CSSPHandle hdl	- [in]
 //          存储句柄
 // param:	const char * object	- [in]
-//          Object名称
+//          Object名称(必须为UTF8编码)
 // param:	const ObjectMetaHandle metadata	- [in]
 //          待设置Object metadata信息
 // param:   CSSPResult result	- [in,out]
@@ -500,7 +500,7 @@ typedef int (*Proc_cssp_set_objectmeta)(const CSSPHandle hdl, const char* object
 // param:	const CSSPHandle hdl	- [in]
 //          存储句柄
 // param:	const char * object	- [in]
-//          Object名称
+//          Object名称(必须为UTF8编码)
 // param:	ObjectMetaHandle  metadata	- [in,out]
 //          返回ObjectMeta
 // param:   CSSPResult result	- [in,out]
@@ -573,7 +573,7 @@ typedef const char* (*Proc_cssp_objectmeta_lastmodify)(const ObjectMetaHandle me
 // param:	const CSSPHandle hdl	- [in]
 //          存储句柄
 // param:	const char * object	- [in]
-//          object名称
+//          object名称(必须为UTF8编码)
 // param:	UploadId upid	- [in,out]
 //          返回一个长度为32位的upload id(用户必须传入一个33字节的数组)
 // author:	zhengyao

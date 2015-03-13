@@ -6,7 +6,7 @@
 #include "tinyxml/tinyxml.h"
 #include "cssp.h"
 #include "jsoncpp/json.h"
-#include "iconv/iconv.h"
+//#include "iconv/iconv.h"
 #include <ctime>
 #include <math.h> 
 #include <clocale>
@@ -190,6 +190,7 @@ std::string URLEncode(const std::string& pcsEncode)
 	return csEncoded;
 }
 
+/*
 std::string GBKtoUTF8(const std::string &from){
 	char *inbuf=const_cast<char*>(from.c_str());
 	size_t inlen = strlen(inbuf);
@@ -204,7 +205,7 @@ std::string GBKtoUTF8(const std::string &from){
 	iconv_close(cd);
 	free(outbuf);
 	return utf8;
-}
+}*/
 
 
 SwiftClient::SwiftClient(const std::string& containerUrl, const std::string& accessKeyId, const std::string& accessKeySecret, int timeout)
@@ -433,7 +434,7 @@ CSSPResult SwiftClient::objectExists(const std::string& object){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + "/" + GBKtoUTF8(object);
+	std::string urlRequst = containerUrl_ + "/" + object;
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -457,7 +458,7 @@ CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr p
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + '/' + GBKtoUTF8(objectname);
+	std::string urlRequst = containerUrl_ + '/' + objectname;
 	if(md5){
 		httpHeader.append(X_OBJECT_ETAG, md5);
 	}
@@ -491,7 +492,7 @@ CSSPResult SwiftClient::putObject(const std::string& objectname, read_data_ptr p
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + "/" + GBKtoUTF8(objectname);
+	std::string urlRequst = containerUrl_ + "/" + objectname;
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -518,7 +519,7 @@ CSSPResult SwiftClient::getObject(const std::string& objectname, write_data_ptr 
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + "/" + GBKtoUTF8(objectname);
+	std::string urlRequst = containerUrl_ + "/" + objectname;
 	char range_begin[30];
 	char range_end[30];
 	std::string range = "bytes=";
@@ -562,7 +563,7 @@ CSSPResult SwiftClient::removeObject(const std::string& object){
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string path = containerUrl_ + '/' + GBKtoUTF8(object);
+	std::string path = containerUrl_ + '/' + object;
 	std::string urlRequst = path + "?multipart-manifest=delete";
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
@@ -585,8 +586,8 @@ CSSPResult SwiftClient::copyObject(const std::string& srcObject, const std::stri
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + "/" + GBKtoUTF8(srcObject);
-	httpHeader.append(X_DESTINATION, dstContainer + "/" + URLEncode(GBKtoUTF8(dstObject)));
+	std::string urlRequst = containerUrl_ + "/" + srcObject;
+	httpHeader.append(X_DESTINATION, dstContainer + "/" + URLEncode(dstObject));
 	httpHeader.append(X_OBJECT_CONTENT_LENGTH, "0");
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
@@ -610,7 +611,7 @@ CSSPResult SwiftClient::setObjectMetadata(const std::string& object, const Objec
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + "/" + GBKtoUTF8(object);
+	std::string urlRequst = containerUrl_ + "/" + object;
 	for(std::map<std::string, std::string>::const_iterator iter = userMetadata.object_meta_.begin(); iter != userMetadata.object_meta_.end(); ++iter){
 		httpHeader.append(ObjectMetadata::object_prefix_ + iter->first, iter->second);
 	}
@@ -636,7 +637,7 @@ CSSPResult SwiftClient::getObjectMetadata(const std::string& object, ObjectMetad
 	CURLcode ccode = CURLE_OK;
 	CSSPResult result;
 	HttpHeader httpHeader;
-	std::string urlRequst = containerUrl_ + "/" + GBKtoUTF8(object);
+	std::string urlRequst = containerUrl_ + "/" + object;
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -705,14 +706,14 @@ CSSPResult SwiftClient::multipartUploadComplete(const std::string& upid){
 	HttpHeader httpHeader;
 	std::string urlRequst;
 	if(multi_uploads_.count(upid)){
-		urlRequst = containerUrl_ + '/' + GBKtoUTF8(multi_uploads_[upid]);
+		urlRequst = containerUrl_ + '/' + multi_uploads_[upid];
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);
 	}
 	//–¥»ÎX-Object-Manifest
 	std::string container = containerUrl_.substr(containerUrl_.find_last_of('/') + 1);
-	httpHeader.append(X_OBJECT_MANIFEST, container + '/' + GBKtoUTF8(multi_uploads_[upid])  + '/' + upid + '/');
+	httpHeader.append(X_OBJECT_MANIFEST, container + '/' + multi_uploads_[upid]  + '/' + upid + '/');
 	Sha1Request request(urlRequst, timeout_ms_, accessKeyId_, accessKeySecret_);
 	request.setheader(httpHeader);
 	HttpResponse response;
@@ -739,7 +740,7 @@ CSSPResult SwiftClient::multipartUploadAbort(const std::string& upid){
 	std::string fixpart, container, object;
 	if(multi_uploads_.count(upid)){
 		urlRequst = containerUrl_ + "?path=" + multi_uploads_[upid] + "/" + upid;
-		urlRequst = GBKtoUTF8(urlRequst);
+		urlRequst = urlRequst;
 	}
 	else{
 		throw iflyException(ERROR_UPLOADID_NOTEXIST, "upload id not exist.", __FILE__, __LINE__);

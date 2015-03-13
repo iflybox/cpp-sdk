@@ -142,6 +142,7 @@ protected:
 		su_proc_load(cssp_result_detail)
 		su_proc_load(cssp_release_result)
 		su_proc_load(cssp_create_instance)
+		su_proc_load(cssp_set_timeout)
 		su_proc_load(cssp_release_instance)
 
 //		su_proc_load(cssp_delete_container_ifempty)
@@ -189,6 +190,7 @@ private:
 	su_proc_decl(cssp_release_result)
 	su_proc_decl(cssp_create_instance)
 	su_proc_decl(cssp_release_instance)
+	su_proc_decl(cssp_set_timeout)
 
 //	su_proc_decl(cssp_delete_container_ifempty)
 	su_proc_decl(cssp_list_object)
@@ -376,6 +378,7 @@ public:
 protected:
 	asc_cmd_entry_begin(cssp_svc)
 		//asc_cmd_entry_pars(cssp_svc, cssp_delete_container_ifempty)
+		asc_cmd_entry_pars(cssp_svc, cssp_set_timeout)
 		asc_cmd_entry_pars(cssp_svc, cssp_object_exist)
 		asc_cmd_entry_pars(cssp_svc, cssp_put_object)
         asc_cmd_entry_pars(cssp_svc, cssp_get_object)
@@ -403,6 +406,7 @@ protected:
 	asc_cmd_entry_end();
 protected:
 	//virtual int on_cssp_delete_container_ifempty(const sc::par_arr& pars);
+	virtual int on_cssp_set_timeout(const sc::par_arr& pars);
 	virtual int on_cssp_object_exist(const sc::par_arr& pars);
 	virtual int on_cssp_put_object(const sc::par_arr& pars);
     virtual int on_cssp_get_object(const sc::par_arr& pars);

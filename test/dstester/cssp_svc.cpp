@@ -89,6 +89,13 @@ int cssp_svc::on_cssp_delete_container_ifempty(const sc::par_arr & pars)
 }
 */
 
+int cssp_svc::on_cssp_set_timeout(const sc::par_arr& pars){
+	dslog_tracer(cssp_svc::on_cssp_set_timeout);
+	int timeout = pars.first_par_int_value(0, 0);
+	int org_timeout = cssp_lib_.cssp_set_timeout()(cssp_handle_, timeout);
+	return 0;
+}
+
 int cssp_svc::on_cssp_object_exist(const sc::par_arr & pars)
 {
 	dslog_tracer(cssp_svc::on_cssp_object_exist);

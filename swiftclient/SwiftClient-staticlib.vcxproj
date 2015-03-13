@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C812B0AE-E70F-4091-9A9F-A136E0F062AD}</ProjectGuid>
+    <ProjectGuid>{58A13DE2-C761-43D6-AAFF-F9D36895D38A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SwiftClient</RootNamespace>
   </PropertyGroup>
@@ -95,24 +95,12 @@
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;CURL_STATICLIB;IFLY_STATIC;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libeay32d.lib;libcurld.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)csspd.dll</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\x86</AdditionalLibraryDirectories>
-      <ImportLibrary>$(OutDir)csspd.lib</ImportLibrary>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-      <ProgramDatabaseFile>$(OutDir)csspd.pdb</ProgramDatabaseFile>
-    </Link>
     <Lib>
       <OutputFile>$(OutDir)csspd-static.lib</OutputFile>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libeay32d-static.lib;libcurld-static.lib;libiconvd-static.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libeay32d-static.lib;libcurld-static.lib;</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <ResourceCompile>
@@ -129,19 +117,9 @@
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;CURL_STATICLIB;IFLY_STATIC;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libeay32d.lib;libcurld.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\x64</AdditionalLibraryDirectories>
-      <OutputFile>$(OutDir)csspd.dll</OutputFile>
-      <ImportLibrary>$(OutDir)csspd.lib</ImportLibrary>
-      <SetChecksum>true</SetChecksum>
-      <ProgramDatabaseFile>$(OutDir)csspd.pdb</ProgramDatabaseFile>
-    </Link>
     <Lib>
       <OutputFile>$(OutDir)csspd-static.lib</OutputFile>
-      <AdditionalDependencies>libeay32d-static.lib;libcurld-static.lib;libiconvd-static.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libeay32d-static.lib;libcurld-static.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\x64</AdditionalLibraryDirectories>
       <TargetMachine>MachineX64</TargetMachine>
     </Lib>
@@ -161,21 +139,10 @@
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;CURL_STATICLIB;IFLY_STATIC;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>$(OutDir)cssp.dll</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libeay32.lib;libcurl.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(OutDir)cssp.lib</ImportLibrary>
-      <ProgramDatabaseFile>$(OutDir)cssp.pdb</ProgramDatabaseFile>
-    </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\x86</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)cssp-static.lib</OutputFile>
-      <AdditionalDependencies>libeay32-static.lib;libcurl-static.lib;libiconv-static.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libeay32-static.lib;libcurl-static.lib;</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <ResourceCompile>
@@ -194,23 +161,12 @@
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;CURL_STATICLIB;IFLY_STATIC;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libeay32.lib;libcurl.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)cssp.dll</OutputFile>
-      <ImportLibrary>$(OutDir)cssp.lib</ImportLibrary>
-      <ProgramDatabaseFile>$(OutDir)cssp.pdb</ProgramDatabaseFile>
-    </Link>
     <Lib>
       <OutputFile>$(OutDir)cssp-static.lib</OutputFile>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libeay32-static.lib;libcurl-static.lib;libiconv-static.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libeay32-static.lib;libcurl-static.lib;</AdditionalDependencies>
       <TargetMachine>MachineX64</TargetMachine>
     </Lib>
     <ResourceCompile>
