@@ -6,7 +6,6 @@
 
 
 
-
 namespace cssp{
 
 	std::string Sha1Request::dataGMT(){
@@ -72,7 +71,42 @@ namespace cssp{
 		return authorization;
 	}
 
+	bool Sha1Request::parse_internal(const std::string& url, std::string& retStr){
+		regex rx("^(?:http://){0,1}\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\:\\d{2,5}/v1/\\w+(?:(/[^?]*))");
+		cmatch res;
+		if(regex_search(url.c_str(), res, rx))
+		{
+			if(res.size() == 2)
+			{
+				retStr = res.str(1);
+				return true;
+			}
+			else if(res.size() == 1){
+				retStr = "";
+				return true;
+			}
+		}
+		return false;
 
+	}
+
+	std::string Sha1Request::parse_url(const std::string& url){
+		//if url is internalURL and startwith ip
+		std::string sign_str;
+		if(parse_internal(url, sign_str)){
+			return sign_str;
+		}
+		std::string::size_type pos = url.find('/', strlen("http://"));
+		if( std::string::npos != pos){
+			std::string::size_type param_pos = url.find('?', pos);
+			if( std::string::npos != param_pos)
+				sign_str = url.substr(pos, param_pos - pos);
+			else
+				sign_str = url.substr(pos);
+		}
+		return sign_str;
+		
+	}
 
 
 	std::string Sha1Request::string_to_sign(const std::string& method, const std::string& date){
@@ -107,15 +141,10 @@ namespace cssp{
 		str_to_sign += canonicalized_headers_str;
 
 		//5.add CanonicalizedResource;
-		std::string::size_type pos = this->url_.find('/', strlen("http://"));
-		if( pos != std::string::npos){
-			std::string::size_type param_pos = this->url_.find('?', pos);
-			if( param_pos != std::string::npos)
-				str_to_sign += this->url_.substr(pos, param_pos - pos);
-			else
-				str_to_sign += this->url_.substr(pos);
+		std::string path = parse_url(this->url_);
+		if(path.empty() == false){
+			str_to_sign += path;
 		}
-
 		return str_to_sign;
 	}
 
